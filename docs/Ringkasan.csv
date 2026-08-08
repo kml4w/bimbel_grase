@@ -1,0 +1,26 @@
+BACKLOG PENGEMBANGAN APLIKASI BIMBEL GRASE,Unnamed: 1
+Dari SRS / BRD / SDD & Prototype HTML Menuju Aplikasi Produksi (Next.js Full-Stack + Vercel + Supabase),
+,
+Disusun untuk:,Tim Pengembangan Aplikasi Bimbel Grase (developer / tim kecil)
+Tanggal:,08 Agustus 2026
+Basis:,prototype.html (SPA referensi tampilan & alur) + Dokumen_SRS_Bimbel_Grase.docx (v1.0.0) + Business_Requirement_Document__BRD__Bimbel_Grase.docx (v1.0.0) + Software_Design_Description__SDD__Bimbel_Grase.docx (v1.0.0)
+Target Stack Produksi:,"Next.js (App Router, TypeScript) full-stack di Vercel, database & Auth & Storage di Supabase (Postgres + RLS)"
+,
+Cara pakai sheet 'Backlog',
+-	Kerjakan berurutan per Fase (0 -> 6) — banyak task di fase belakang bergantung pada skema tabel/logic yang dibangun di fase sebelumnya.,
+"-	Ubah kolom Status jadi 'Sedang Dikerjakan' saat mulai, 'Selesai' saat sudah di-deploy & di-commit ke Git — pakai dropdown yang sudah disediakan.",
+"-	Kolom Kategori memisahkan jenis pekerjaan: Bisnis (keputusan/klarifikasi), Infra (setup Vercel/Supabase), DB (migration & RLS Supabase), Backend (Server Action/Route Handler), UI (halaman/komponen Next.js), Integrasi (API pihak ketiga), Testing, Kepatuhan, Rollout.",
+-	Kolom Prioritas: Wajib = aplikasi tidak bisa dipakai tanpa ini; Tinggi = penting tapi bisa menyusul; Menengah = bisa ditunda ke iterasi berikutnya.,
+"-	Kolom Prompt berisi teks siap Copy-Paste ke AI coding agent (Claude Code/Cursor/dsb) — sudah merujuk ke prototype.html dan dokumen SRS/BRD/SDD sebagai acuan, supaya AI tidak mendesain ulang dari nol.",
+-	Pakai AutoFilter di header untuk fokus ke satu Fase/Modul/Kategori saja saat mengerjakan backlog harian.,
+,
+Ringkasan Jumlah Task per Fase,
+Fase,Jumlah Task
+Fase 0 - Pra-Development,19
+"Fase 1 - Fondasi: Database, Auth & Layout",17
+Fase 2 - Portal Orang Tua & Pendaftaran,15
+Fase 3 - Pembayaran SPP & Paywall,15
+Fase 4 - E-Learning / LMS,19
+Fase 5 - Admin Console & Pelaporan,18
+"Fase 6 - Integrasi, Keamanan, Testing & Rollout",18
+TOTAL,121

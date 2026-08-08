@@ -1,0 +1,750 @@
+--- Activity Diagram & Alur Proses Bimbel Grase.docx ---
+Dokumen Activity Diagram & Alur Proses Bisnis
+Sistem Informasi Manajemen, Portofolio Orang Tua & E-Learning Bimbel Grase
+Versi Dokumen: 1.0.0
+Tanggal: 7 Agustus 2026
+Disusun Oleh: System Analyst & UI/UX Engineering Team Bimbel Grase
+1. Pendahuluan
+Dokumen ini berisi rancangan Activity Diagram (Diagram Aktivitas) yang menggambarkan alur kerja (workflow), urutan aktivitas bisnis, titik keputusan (decision nodes), serta pembagian peran (swimlanes) dalam Aplikasi Bimbel Grase.
+Activity Diagram ini mencakup 3 (tiga) proses bisnis utama sistem:
+Diagram 1: Alur Pendaftaran Siswa  Pembayaran SPP  Pembukaan Paywall Access E-Learning.
+Diagram 2: Alur Pembuatan & Publikasi Modul Belajar, Kuis Interaktif, dan Tugas LMS.
+Diagram 3: Alur Pengerjaan Tugas/Kuis oleh Siswa  Pemeriksaan & Input Nilai oleh Tutor  Notifikasi Nilai ke Orang Tua.
+2. Activity Diagram 1: Pendaftaran, Pembayaran & Unlock Paywall E-Learning
+Diagram ini mendeskripsikan alur awal orang tua mendaftarkan anak, melakukan pengiriman bukti transfer, hingga admin melakukan verifikasi pembayaran untuk membuka pembatasan fitur (Paywall Lock) pada portal E-Learning.
++-------------------+----------------------------+-------------------+-------------------+|  ORANG TUA (WALI) |     CLIENT SPA ENGINE      |    ADMIN PUSAT    |   PAYWALL GUARD   |+-------------------+----------------------------+-------------------+-------------------+|                   |                            |                   |                   ||       (*)         |                            |                   |                   ||        |          |                            |                   |                   ||        v          |                            |                   |                   ||  [ Buka Landing ] |                            |                   |                   ||  [   Page       ] |                            |                   |                   ||        |          |                            |                   |                   ||        v          |                            |                   |                   ||  [ Isikan Form  ] |                            |                   |                   ||  [ Registration ] |                            |                   |                   ||        |          |                            |                   |                   ||        v          |                            |                   |                   ||  [ Klik Submit  ]----->[ Validasi Input ]      |                   |                   ||                        [   Formulir     ]      |                   |                   ||                              |                 |                   |                   ||                        +-----+-----+           |                   |                   ||                        |           |           |                   |                   ||                    [Lengkap?]  [Valid]         |                   |                   ||                       /             \          |                   |                   ||                    (Tidak)        (Ya)         |                   |                   ||                      /               \         |                   |                   ||                     v                 v        |                   |                   ||              [ Tampilkan ]     [ Buat Profil ] |                   |                   ||              [ Peringatan]     [ Ortu & Anak ] |                   |                   ||                     |                 |        |                   |                   ||                     v                 v        |                   |                   ||               (Perbaiki)       [ Status SPP  ] |                   |                   ||                                [ = 'unpaid'  ] |                   |                   ||                                       |        |                   |                   ||                                       v        |                   |                   ||  [ Tinjau Biaya ]<-------------[ Hitung Total] |                   |                   ||  [ SPP & Reg.   ]              [ Tagihan SPP ] |                   |                   ||        |                                       |                   |                   ||        v                                       |                   |                   ||  [ Transfer via ]                              |                   |                   ||  [ Bank / QRIS  ]                              |                   |                   ||        |                                       |                   |                   ||        v                                       |                   |                   ||  [ Upload Foto  ]                              |                   |                   ||  [ Bukti Transfer]                             |                   |                   ||        |                                       |                   |                   ||        v                                       |                   |                   ||  [ Klik Kirim   ]----->[ Set Status SPP ]      |                   |                   ||  [ Bukti Bayar  ]      [  = 'pending'   ]      |                   |                   ||                              |                 |                   |                   ||                              +--------------------->[ Tinjau Bukti ]                   ||                                                |    [ Pembayaran   ]                   ||                                                |          |                            ||                                                |          v                            ||                                                |    [ Render Canvas]                   ||                                                |    [ Digital Nota ]                   ||                                                |          |                            ||                                                |    +-----+-----+                      ||                                                |    | Validasi? |                      ||                                                |    +-----+-----+                      ||                                                |   /             \                     ||                                            (Tidak)              (Ya)                   ||                                              /                     \                   ||                                             v                       v                  ||                                      [ Tolak / Minta ]     [ Klik Approve ]            ||                                      [ Konfirmasi WA ]     [ Verifikasi   ]            ||                                             |                       |                  ||                                             v                       v                  ||                                       [ Tetap Pending]     [ Set Status SPP]           ||                                                            [ = 'verified'  ]           ||                                                                     |                  ||                                                                     v                  ||  [ Akses Fitur  ]<--------------------------------------------------+--->[ Unlock Access]|  [ LMS Terbuka  ]                                                        [  E-Learning ]|        |                                                                       ||        v                                                                       v|       (*)                                                                     (*)+-------------------+----------------------------+-------------------+-------------------+
+Formula Perhitungan Tagihan Registrasi Awal:
+Total biaya yang dibayarkan oleh Orang Tua pada saat pendaftaran dihitung berdasarkan formula:
+Keterangan:  (bulan ke-1) dan  menyesuaikan program kelas yang dipilih.
+3. Activity Diagram 2: Alur Publikasi Modul Belajar, Kuis Interaktif & Tugas LMS
+Diagram ini mendeskripsikan langkah kerja pengajar/admin dalam memublikasikan materi pelajaran berbasis PDF, menyusun kuis pilihan ganda interaktif, serta menerbitkan lembar tugas LMS ke dalam sistem.
++---------------------------------+---------------------------------+---------------------------------+|     TUTOR / ADMIN PUSAT         |     SYSTEM ENGINE & STORAGE     |     PORTAL E-LEARNING SISWA     |+---------------------------------+---------------------------------+---------------------------------+|                                 |                                 |                                 ||               (*)               |                                 |                                 ||                |                |                                 |                                 ||                v                |                                 |                                 ||      [ Buka Central Console ]   |                                 |                                 ||      [ Tab Modul & Kuis     ]   |                                 |                                 ||                |                |                                 |                                 ||                +----------------+----------------+                |                                 ||                |                                 |                |                                 ||                v                                 v                |                                 ||      (Pilih Aksi Pengelolaan)             (Pilih Aksi Kuis)       |                                 ||                |                                 |                |                                 ||       +--------+--------+                        v                |                                 ||       |                 |               [ Input Judul Kuis,]      |                                 ||       v                 v               [ Target Kelas,    ]      |                                 || [ Upload Berkas ] [ Buat Tugas  ]       [ & Durasi Menit  ]      |                                 || [ Modul PDF     ] [ LMS Baru    ]                |                |                                 ||       |                 |                        v                |                                 ||       |                 |               [ Tentukan Jumlah  ]      |                                 ||       |                 |               [ Soal (1 - 10)    ]      |                                 ||       |                 |                        |                |                                 ||       |                 |                        v                |                                 ||       |                 |               [ Render Form Soal ]      |                                 ||       |                 |               [ & Opsi A / B / C ]      |                                 ||       |                 |                        |                |                                 ||       |                 |                        v                |                                 ||       |                 |               [ Isi Pertanyaan,  ]      |                                 ||       |                 |               [ Opsi & Kunci     ]      |                                 ||       |                 |                        |                |                                 ||       +--------+--------+                        |                |                                 ||                |                                 |                |                                 ||                v                                 v                |                                 ||      [ Simpan & Publikasikan ]--------->[ Validasi Struktur ]     |                                 ||      [ Ke Kelas Target       ]          [ Data JSON Object  ]     |                                 ||                                                  |                |                                 ||                                                  v                |                                 ||                                         [ Inject ke Array   ]     |                                 ||                                         [ AppState/Database ]     |                                 ||                                                  |                |                                 ||                                                  +--------------------->[ Render Komponen  ]|                                                                   |[ Modul / Kuis / ]|                                                                   |[ Tugas di E-LMS ]|                                                                   |          ||                                                                   |          v|                                                                   |         (*)+---------------------------------+---------------------------------+---------------------------------+
+4. Activity Diagram 3: Alur Pengerjaan Tugas, Evaluasi & Input Nilai
+Diagram ini menggambarkan alur kerja interaktif ketika siswa mengerjakan kuis harian atau mengunggah jawaban tugas sekolah, dilanjutkan dengan pemeriksaan oleh tutor dan pencatatan nilai ke rekapitulasi siswa.
++------------------+-----------------------+-----------------------+-----------------------+|  SISWA / WALI    |   SYSTEM LMS ENGINE   |    TUTOR / PENGAJAR   |     PORTAL REKAP      |+------------------+-----------------------+-----------------------+-----------------------+|                  |                       |                       |                       ||       (*)        |                       |                       |                       ||        |         |                       |                       |                       ||        v         |                       |                       |                       ||  [ Buka Menu ]   |                       |                       |                       ||  [ E-Learning]   |                       |                       |                       ||        |         |                       |                       |                       ||        +---------+-----------+           |                       |                       ||        |                     |           |                       |                       ||        v                     v           |                       |                       ||  (Pilih Kuis)          (Pilih Tugas)     |                       |                       ||        |                     |           |                       |                       ||        v                     v           |                       |                       ||  [ Jawab Soal  ]       [ Upload Lembar]  |                       |                       ||  [ Pilihan Ganda]      [ Jawaban PDF  ]  |                       |                       ||        |                     |           |                       |                       ||        v                     v           |                       |                       ||  [ Klik Submit ]       [ Klik Send    ]  |                       |                       ||        |                     |           |                       |                       ||        |                     v           |                       |                       ||        |             [ Set Status     ]----->[ Buka Submisi    ] |                       ||        |             [ = 'submitted'  ]      [ Jawaban Siswa   ] |                       ||        |                                             |           |                       ||        |                                             v           |                       ||        |                                     [ Periksa Berkas  ] |                       ||        |                                     [ & Berikan Nilai ] |                       ||        |                                             |           |                       ||        |                                             v           |                       ||        |                                     [ Input Catatan   ] |                       ||        |                                     [ Evaluasi Guru   ] |                       ||        |                                             |           |                       ||        |                                             v           |                       ||        |                                     [ Simpan Nilai    ] |                       ||        v                                             |           |                       ||  [ Hitung Skor ]                                     |           |                       ||  [ Otomatis    ]                                     |           |                       ||        |                                             |           |                       ||        +---------------------+-----------------------+           |                       ||                              |                                   |                       ||                              v                                   |                       ||                     [ Simpan Nilai ke ]                          |                       ||                     [ Entitas GRADE   ]--------------------------------->[ Tampilkan Nilai]|                              |                                   |[ & Predikat A/B/C]|                              v                                   |          ||                     [ Tampilkan Skor  ]                          |          v|                     [ & Reward Star   ]                          |         (*)|                              |                                   ||                              v                                   ||                             (*)                                  |+------------------+-----------------------+-----------------------+-----------------------+
+Formula Kalkulasi Skor Kuis & Predikat Huruf:
+Skor kuis interaktif diproses otomatis di tingkat sistem menggunakan kalkulasi:
+Predikat huruf disesuaikan dengan aturan kriteria:
+5. Ringkasan Matriks Titik Keputusan (Decision Points Summary)
+| Kode Diagram | Titik Keputusan (Decision Node) | Kondisi Ya (True) | Kondisi Tidak (False) |
+| AD-01 | Validasi Input Registration | Simpan profil orang tua & buat akun baru | Tampilkan pesan peringatan melengkapi formulir |
+| AD-01 | Verifikasi Bukti Pembayaran Admin | Set paymentStatus = 'verified' & Unlock Paywall | Mintai konfirmasi via WA / Tolak bukti bayar |
+| AD-02 | Validasi Berkas / JSON Kuis | Publish kuis/modul ke E-Learning kelas target | Tampilkan pesan kesalahan format/ukuran file |
+| AD-03 | Penilaian Jawaban Kuis Siswa | Skor  jika seluruh opsi kunci terisi benar | Skor diproporsikan sesuai total jawaban benar |
+
+--- Business Requirement Document (BRD) Bimbel Grase.docx ---
+Business Requirement Document (BRD)
+Sistem Informasi Manajemen, Portofolio Orang Tua & E-Learning Bimbel Grase
+Versi Dokumen: 1.0.0
+Tanggal: 7 Agustus 2026
+Disusun Oleh: Senior Business Analyst / Tim Pengembangan Sistem Bimbel Grase
+Status: Disetujui untuk Implementasi
+1. Pendahuluan & Ringkasan Eksekutif
+1.1 Latar Belakang (Business Context)
+Bimbel Grase merupakan lembaga bimbingan belajar yang berfokus pada pengembangan fondasi akademik anak (mulai dari tingkat toddler/calistung hingga pendampingan SD dan persiapan ujian/olimpiade). Seiring meningkatnya jumlah siswa dan cakupan program belajar, metode operasional konvensional yang mengandalkan rekapitulasi manual via pesan instan (WhatsApp) dan pencatatan kertas menghadapi beberapa kendala utama:
+Rekapitulasi Pembayaran SPP yang Terfragmentasi: Pengelola sering kesulitan memverifikasi bukti transfer pembayaran bulanan dari orang tua murid secara akurat dan tepat waktu, sehingga berisiko menimbulkan ketidaksesuaian pencatatan keuangan.
+Pengelolaan Banyak Anak dalam Satu Keluarga (Multi-Child Households): Banyak orang tua yang mendaftarkan lebih dari satu anak. Tanpa sistem terpusat, orang tua harus melakukan pendaftaran atau pemantauan secara terpisah yang tidak efisien.
+Kebutuhan Fasilitas Guided Discovery E-Learning: Perkembangan metode belajar modern menuntut ketersediaan materi digital, kuis interaktif, dan penyerahan tugas (assignment submissions) yang terintegrasi langsung dengan status keaktifan/pembayaran siswa.
+1.2 Tujuan Bisnis (Business Objectives)
+Pengembangan Aplikasi Bimbel Grase bertujuan untuk memdigitalisasi dan mengintegrasikan seluruh ekosistem bimbingan belajar dengan sasaran utama:
+Meningkatkan Efisiensi Operasional Administrasi: Mengurangi beban rekapitulasi manual sebesar  melalui otomatisasi penagihan SPP, verifikasi berbasis bukti digital, dan pembuatan nota otomatis (canvas receipt generation).
+Meningkatkan Kepuasan dan Retensi Orang Tua (Parent Experience): Menyediakan portal terpadu untuk pendaftaran multi-anak, kemudahan bertukar profil anak (Child Switcher), serta transparansi pemantauan akademik dan pembayaran.
+Mengoptimalkan Proteksi Pendapatan (Revenue Protection): Mengimplementasikan mekanisme Paywall Lock otomatis yang membatasi akses modul E-learning dan kuis interaktif sampai status SPP siswa terkonfirmasi LUNAS.
+Menyediakan Pusat Manajemen Akademik Terpadu: Memberikan Central Admin Console bagi staf dan pengajar untuk mengelola kelas, mempublikasikan modul/kuis, serta merekapitulasi nilai dan laporan siswa secara real-time.
+2. Pemangku Kepentingan (Stakeholders Analysis)
+Tabel berikut merinci analisis pemangku kepentingan yang terlibat serta dampak sistem terhadap masing-masing peran:
+Peran Pemangku Kepentingan
+Deskripsi Peran
+Peran dalam Sistem / Kebutuhan Bisnis
+Pemilik & Manajemen Bimbel
+Pemilik lembaga dan pembuat keputusan strategis.
+* Memantau Key Performance Indicators (KPI) operasional.
+* Memastikan pertumbuhan pendapatan dan transparansi laporan keuangan SPP.
+* Meningkatkan brand image Bimbel Grase sebagai bimbel modern berbasis digital.
+Staf Admin Pusat & Kasir
+Pengelola harian administrasi, keuangan, dan data siswa.
+* Memverifikasi bukti transfer pembayaran SPP masuk.
+* Menambah/memperbarui data program, kelas, dan data siswa.
+* Mencetak laporan rekapitulasi keuangan dan data akademik siswa.
+Pengajar / Tutor
+Tenaga pengajar di Bimbel Grase.
+* Mengunggah materi pembelajaran (PDF).
+* Membuat kuis harian interaktif dan penugasan LMS.
+* Memeriksa tugas yang dikirim siswa serta menginput nilai dan catatan pengajar.
+Orang Tua / Wali Murid
+Pihak pembayar tagihan sekaligus pendamping belajar anak.
+* Mendaftarkan anak secara online (termasuk multi-anak).
+* Melakukan pertukaran profil anak aktif (Child Switcher) dan memperbarui foto profil.
+* Mengunggah bukti bayar SPP dan memantau status kelulusan verifikasi.
+* Memantau nilai dan perkembangan akademik anak.
+Siswa / Ananda
+Peserta didik Bimbel Grase.
+* Membaca/mengunduh modul PDF.
+* Mengerjakan kuis interaktif berhadiah bintang visual.
+* Mengunggah lembar jawaban tugas sekolah.
+3. Indikator Keberhasilan Bisnis (Key Performance Indicators / KPIs)
+Keberhasilan implementasi sistem Bimbel Grase diukur menggunakan tolok ukur kuantitatif dan kualitatif berikut:
+Waktu Pemrosesan Verifikasi Keuangan: Memangkas durasi verifikasi pembayaran SPP dari rata-rata  menjadi kurang dari  kerja.
+Tingkat Ketepatan Pembayaran SPP (On-Time SPP Payment Rate): Meningkatkan kepatuhan pembayaran SPP sebelum tenggat waktu hingga  berkat kejelasan status tagihan dan kemudahan akses di portal.
+Pengurangan Keluhan Komunikasi Administrasi: Mengurangi  pertanyaan berulang dari orang tua terkait rincian tagihan atau jadwal melalui otomatisasi info di Parent Dashboard.
+Adopsi Fitur E-Learning: Memastikan  siswa aktif memanfaatkan kuis interaktif dan penyerahan tugas via portal LMS.
+4. Cakupan Solusi Bisnis (Business Scope)
+4.1 Dalam Cakupan (In-Scope)
+Portal Orang Tua & Pendaftaran Online:
+Formulir pendaftaran dinamis untuk mendaftarkan lebih dari 1 anak dalam 1 alur.
+Dasbor portofolio orang tua lengkap dengan status tagihan dan ringkasan jadwal.
+Fitur Child Switcher untuk beralih antar profil anak dengan cepat.
+Pengelolaan foto profil anak dengan pratinjau gambar (live preview).
+Manajemen Tagihan SPP & Paywall:
+Perhitungan otomatis tagihan awal:
+Dukungan upload bukti bayar (Transfer Bank BCA & QRIS/E-Wallet).
+Fitur pembatasan akses (Paywall) pada E-Learning yang terbuka otomatis saat status LUNAS.
+Pembayaran SPP lanjutan untuk bulan-bulan berikutnya.
+Sistem E-Learning (LMS):
+Pengaksesan dan pengunduhan modul PDF.
+Pengerjaan kuis pilihan ganda interaktif dengan timer dan kalkulasi skor otomatis.
+Pengiriman jawaban tugas oleh siswa dan penilaian oleh tutor.
+Central Admin Console:
+Dashboard KPI ringkasan total kelas, siswa, modul, dan pendapatan.
+Manajemen CRUD Kelas dan CRUD Siswa.
+Antrean verifikasi pembayaran dilengkapi Modal Canvas Receipt Generator.
+Pembuat kuis dinamis (1–10 soal) dan input nilai siswa.
+Pelaporan dan ekspor rekapitulasi data akademik serta keuangan.
+4.2 Luar Cakupan (Out-of-Scope untuk Versi 1.0)
+Payment Gateway Payment Processing otomatis secara real-time (pada V1.0 masih menggunakan verifikasi semi-otomatis oleh Admin berdasarkan bukti pengunggahan).
+Fitur Video Conference / Live Streaming internal (menggunakan pranala luar seperti Zoom/Google Meet jika diperlukan).
+Modul penggajian (payroll) untuk pengajar dan tutor.
+5. Alur Proses Bisnis Utama (Core Business Workflows)
++-----------------------------------------------------------------------------------+|                            ALUR PROSES BISNIS UTAMA                               |+-----------------------------------------------------------------------------------+[ORANG TUA]                               [SISTEM]                         [ADMIN PUSAT]    |                                        |                                   |    |--- 1. Isip Pendaftaran (Multi-Anak) -->|                                   |    |                                        |--- 2. Hitung Tagihan & Set status |    |                                        |       'unpaid' & Kunci E-Learning |    |                                        |                                   |    |<-- 3. Tampilkan Detail Tagihan SPP ----|                                   |    |                                        |                                   |    |--- 4. Upload Bukti Transfer ----------->|                                   |    |                                        |--- 5. Ubah Status 'pending' ----->|    |                                        |                                   |    |                                        |                                   |-- 6. Tinjau Bukti    |                                        |                                   |   & Klik 'Approve'    |                                        |<-- 7. Update Status 'verified' ---|    |                                        |                                   |    |<-- 8. Paywall Terbuka Automatikan -----|                                   |    |                                        |                                   |    |--- 9. Akses LMS, Kuis & Tugas -------->|                                   |    |                                        |--- 10. Catat Nilai & Skor ------->|-- 11. Cetak Laporan
+5.1 Alur Pendaftaran dan Aktivasi Siswa
+Orang tua mengakses situs Bimbel Grase dan mengisi form pendaftaran online (bisa mendaftarkan 1 atau lebih anak).
+Sistem membuatkan akun orang tua dan menghasilkan rincian tagihan SPP awal.
+Sistem secara otomatis menerapkan Paywall Lock pada E-Learning siswa.
+5.2 Alur Verifikasi Pembayaran SPP
+Orang tua memilih metode pembayaran (Bank Transfer BCA / QRIS) dan mengunggah foto bukti transfer.
+Status tagihan siswa berubah menjadi pending.
+Admin Pusat menerima notifikasi pada antrean verifikasi dan dapat melihat pratinjau nota digital (Canvas-generated receipt).
+Admin mengeklik Approve (Lunas), status berubah menjadi verified.
+Sistem membuka kunci Paywall secara otomatis, memberikan akses penuh ke E-Learning.
+5.3 Alur Kegiatan Akademik E-Learning
+Siswa/Orang tua masuk ke portal E-Learning yang sudah terbuka.
+Siswa mengunduh modul PDF atau mengerjakan kuis interaktif berbasis waktu.
+Siswa mengunggah berkas/foto lembar jawaban tugas sekolah sebelum batas tenggat (due date).
+Pengajar memeriksa tugas melalui Admin Console, memberikan nilai angka (0–100), dan menambahkan catatan evaluasi.
+Nilai secara otomatis masuk ke dalam rekapitulasi laporan akademik siswa.
+6. Asumsi dan Keterbatasan Bisnis (Assumptions & Constraints)
+6.1 Asumsi Bisnis
+Orang tua murid memiliki perangkat telepon pintar (smartphone) atau laptop dengan koneksi internet yang memadai untuk mengakses portal berbasis web.
+Admin Pusat dan Pengajar melakukan pemantauan antrean verifikasi dan pemeriksaan tugas secara berkala pada hari kerja.
+6.2 Keterbatasan Bisnis (Business Constraints)
+Kebutuhan Biaya Operasional: Pengembangan harus memanfaatkan arsitektur web yang ringan (Single Page Application) agar dapat berjalan optimal pada server berkapasitas standar tanpa membebankan biaya hosting yang tinggi.
+Kepatuhan Privasi Data: Data kontak WhatsApp dan riwayat pembayaran orang tua bersifat rahasia dan hanya boleh diakses oleh Staf Admin Pusat yang berwenang.
+7. Justifikasi Nilai Bisnis & Pengembalian Investasi (ROI / Value Justification)
+Implementasi aplikasi Bimbel Grase memberikan dampak langsung pada efisiensi dan potensi pertumbuhan bisnis lembaga:
+Peningkatan Efisiensi Waktu Operasional: Menghemat hingga  kerja staf administrasi per minggu dari aktivitas rekapitulasi bukti bayar manual dan penyebaran modul satu per satu.
+Pengurangan Churn Rate Siswa: Pengalaman belajar yang interaktif dengan sistem imbalan bintang (star rewards) pada kuis serta kemudahan pemantauan oleh orang tua dapat meningkatkan retention rate siswa hingga .
+Skalabilitas Bisnis: Platform ini siap mendukung penambahan cabang atau program belajar baru tanpa memerlukan penambahan jumlah staf administrasi secara linear.
+
+--- Class Diagram & Perancangan Kelas Bimbel Grase.docx ---
+Dokumen Class Diagram & Perancangan Kelas (Structural Design)
+Sistem Informasi Manajemen, Portofolio Orang Tua & E-Learning Bimbel Grase
+Versi Dokumen: 1.0.0
+Tanggal: 7 Agustus 2026
+Disusun Oleh: Senior Software Engineer / System Architect Bimbel Grase
+Status: Draf Final Perancangan Struktur Data & Kelas
+1. Pendahuluan
+Dokumen Class Diagram ini menggambarkan struktur statis sistem (static structural view) untuk Aplikasi Bimbel Grase. Diagram ini mendefinisikan kelas-kelas utama dalam sistem, atribut data beserta tipe datanya, operasi/metode internal, hak akses (visibility), serta hubungan antar-kelas (associations, aggregations, dependencies, multiplicities).
+2. Visualisasi Class Diagram (ASCII Structural Diagram)
++------------------------------------+                    +------------------------------------+|             OrangTua               |                    |              Program               |+------------------------------------+                    +------------------------------------+| - parentEmail: String {PK}         |                    | - id: Integer {PK}                 || - parentName: String               |                    | - name: String                     || - parentPhone: String              |                    | - targetAge: String                || - passwordHash: String             |                    | - tutor: String                    |+------------------------------------+                    | - schedule: String                 || + registerAccount(): Boolean       |                    | - fee: Double                      || + login(): Boolean                 |                    | - desc: String                     || + addChildrenCard(): Void          |                    +------------------------------------+| + switchActiveChild(index): Void   |                    | + getProgramInfo(): String         |+------------------------------------+                    | + updateFee(newFee): Void          |                  | 1                                     +------------------------------------+                  |                                                         | 1                  | 1..* (Mengelola)                                        |                  v                                                         | 0..* (Diikuti)+---------------------------------------------------------------------------+------------------+|                                              Siswa                                           |+----------------------------------------------------------------------------------------------+| - id: Integer {PK}                                                                           || - parentEmail: String {FK}                                                                   || - studentName: String                                                                        || - age: String                                                                                || - programName: String {FK}                                                                   || - paymentStatus: Enum {'unpaid', 'pending', 'verified'}                                      || - billingPeriod: String                                                                      || - billingCount: Integer                                                                      || - avatarUrl: String                                                                          |+----------------------------------------------------------------------------------------------+| + updateAvatar(newAvatarData): Void                                                          || + setPaymentStatus(status): Void                                                             || + calculateTotalFee(): Double                                                                || + isPaywallUnlocked(): Boolean                                                               |+----------------------------------------------------------------------------------------------+   | 1                           | 1                                            | 1   |                             |                                              |   | 0..* (Memiliki)             | 0..* (Mengirim)                              | 0..* (Menerima)   v                             v                                              v+-----------------------+    +------------------------------------+    +-----------------------+|      Pembayaran       |    |              Submisi               |    |         Nilai         |+-----------------------+    +------------------------------------+    +-----------------------+| - id: Integer {PK}    |    | - id: Integer {PK}                 |    | - id: Integer {PK}    || - studentId: Int {FK} |    | - assignmentId: Integer {FK}       |    | - studentId: Int {FK} || - billingPeriod: Str  |    | - studentId: Integer {FK}          |    | - taskName: String    || - amount: Double      |    | - submittedFile: String            |    | - score: Integer      || - paymentMethod: Str  |    | - submittedAt: String              |    | - gradeLetter: String || - proofFile: String   |    | - status: Enum {'submitted', ...}  |    | - notes: String       || - status: Enum        |    | - score: Integer                   |    +-----------------------++-----------------------+    | - notes: String                    |    | + calculateLetter():  || + uploadProof(): Void |    +------------------------------------+    |   String              || + verify(): Void      |    | + submitAssignment(): Void         |    +-----------------------++-----------------------+    | + gradeSubmission(score): Void     |                             +------------------------------------+                                               |                                               | N (Diserahkan untuk)                                               v+-----------------------+    +------------------------------------+    +-----------------------+|         Modul         |    |               Tugas                |    |         Kuis          |+-----------------------+    +------------------------------------+    +-----------------------+| - id: Integer {PK}    |    | - id: Integer {PK}                 |    | - id: Integer {PK}    || - programName: String |    | - programName: String {FK}         |    | - programName: String || - title: String       |    | - title: String                    |    | - title: String       || - pdfFileName: String |    | - pdfTitle: String                 |    | - questionsCount: Int || - desc: String        |    | - openedDate: String               |    | - duration: String    || - uploadDate: String  |    | - dueDate: String                  |    | - questionsJSON: Text |+-----------------------+    | - highlightText: String            |    +-----------------------+| + downloadPDF(): File |    | - instructions: Array              |    | + calculateScore():   |+-----------------------+    +------------------------------------+    |   Integer             |                             | + publishTask(): Void              |    +-----------------------+                             +------------------------------------+
+3. Rincian Spesifikasi Kelas (Detailed Class Specification)
+3.1 Kelas OrangTua (Parent Entity)
+Mengelola kredensial akun wali serta hubungan dengan 1 atau beberapa anak terdaftar (Multi-Child Management).
+Atribut:
+- parentEmail: String (Primary Key) — Email aktif sebagai username login.
+- parentName: String — Nama lengkap orang tua/wali.
+- parentPhone: String — Nomor WhatsApp aktif.
+- passwordHash: String — Kata sandi terenkripsi.
+Metode (Operations):
++ registerAccount(parentData, childrenList): Boolean — Memproses pendaftaran akun baru beserta daftar anak.
++ login(email, password): Boolean — Autentikasi pengguna ke portal orang tua.
++ addChildrenCard(childData): Void — Menambahkan profil anak baru di bawah email orang tua aktif.
++ switchActiveChild(childIndex): Void — Mengubah indeks penunjuk anak aktif (activeChildIndex).
+3.2 Kelas Siswa (Student Entity)
+Merepresentasikan entitas anak yang terdaftar pada program bimbingan belajar Bimbel Grase.
+Atribut:
+- id: Integer (Primary Key) — Identifier unik siswa.
+- parentEmail: String (Foreign Key) — Referensi ke entitas OrangTua.
+- studentName: String — Nama panggilan / lengkap anak.
+- age: String — Usia siswa (contoh: "5 Tahun").
+- programName: String (Foreign Key) — Program/kelas yang diikuti.
+- paymentStatus: Enum {'unpaid', 'pending', 'verified'} — Status SPP saat ini.
+- billingPeriod: String — Periode tagihan aktif (contoh: "Agustus 2026").
+- billingCount: Integer — Jumlah episode bulan bayar.
+- avatarUrl: String — URL/Base64 foto profil anak.
+Metode (Operations):
++ updateAvatar(newAvatarData): Void — Memperbarui foto profil siswa.
++ setPaymentStatus(status): Void — Mengubah status pembayaran siswa.
++ calculateTotalFee(): Double — Menghitung biaya tagihan ().
++ isPaywallUnlocked(): Boolean — Mengembalikan nilai true jika paymentStatus == 'verified'.
+3.3 Kelas Program (Class / Course Entity)
+Menyimpan katalog program bimbingan belajar yang ditawarkan oleh Bimbel Grase.
+Atribut:
+- id: Integer (Primary Key) — ID program kelas.
+- name: String — Nama program (contoh: "Super Calistung").
+- targetAge: String — Kategori usia (contoh: "Toddler 4-5 Thn").
+- tutor: String — Nama pengajar penanggung jawab.
+- schedule: String — Hari dan jam pelaksanaan kelas.
+- fee: Double — Nominal biaya SPP bulanan (Rp).
+- desc: String — Deskripsi program belajar.
+Metode (Operations):
++ getProgramInfo(): String — Mengembalikan ringkasan detail kelas.
++ updateFee(newFee): Void — Memperbarui nominal biaya SPP.
+3.4 Kelas Pembayaran (Payment Transaction Entity)
+Mencatat riwayat dan status transaksi pembayaran SPP bulanan.
+Atribut:
+- id: Integer (Primary Key) — Nomor referensi transaksi (TRX-ID).
+- studentId: Integer (Foreign Key) — Referensi ke entitas Siswa.
+- billingPeriod: String — Bulan & tahun tagihan.
+- amount: Double — Total nominal yang ditransfer.
+- paymentMethod: String — Metode bayar ("Bank Transfer BCA" / "QRIS").
+- proofFile: String — Data berkas/DataURL nota transfer.
+- status: Enum {'unpaid', 'pending', 'verified'} — Status verifikasi admin.
+Metode (Operations):
++ uploadProof(fileData): Void — Mengunggah berkas nota transfer dan mengubah status ke pending.
++ verify(): Void — Persetujuan admin yang mengubah status ke verified dan membuka Paywall.
+3.5 Kelas Modul (Learning Module Entity)
+Menyimpan berkas materi pelajaran berbasis PDF yang dapat diunduh siswa.
+Atribut:
+- id: Integer (Primary Key) — ID materi modul.
+- programName: String (Foreign Key) — Target program kelas.
+- title: String — Judul materi modul.
+- pdfFileName: String — Nama berkas PDF.
+- desc: String — Ringkasan materi.
+- uploadDate: String — Tanggal publikasi.
+Metode (Operations):
++ downloadPDF(): File — Mengunduh materi modul PDF.
+3.6 Kelas Tugas (LMS Assignment Entity)
+Menerbitkan tugas/PR dari tutor yang memerlukan unggahan jawaban dari siswa.
+Atribut:
+- id: Integer (Primary Key) — ID penugasan.
+- programName: String (Foreign Key) — Target program kelas.
+- title: String — Judul tugas/pertemuan.
+- pdfTitle: String — Judul materi lampiran PDF.
+- openedDate: String — Waktu pembukaan tugas.
+- dueDate: String — Batas akhir pengiriman (deadline).
+- highlightText: String — Penekanan instruksi utama.
+- instructions: Array<String> — Daftar langkah pengerjaan.
+Metode (Operations):
++ publishTask(): Void — Mempublikasikan tugas ke portal siswa.
+3.7 Kelas Submisi (Submission Entity)
+Menyimpan berkas jawaban tugas yang dikirimkan oleh siswa beserta hasil penilainnya.
+Atribut:
+- id: Integer (Primary Key) — ID berkas pengiriman.
+- assignmentId: Integer (Foreign Key) — Referensi ke Tugas.
+- studentId: Integer (Foreign Key) — Referensi ke Siswa.
+- submittedFile: String — Nama berkas/foto jawaban siswa.
+- submittedAt: String — Waktu pengiriman.
+- status: Enum {'submitted', 'graded'} — Status pemeriksaan.
+- score: Integer — Nilai angka (0–100).
+- notes: String — Catatan evaluasi pengajar.
+Metode (Operations):
++ submitAssignment(fileData): Void — Merekam berkas jawaban siswa.
++ gradeSubmission(score, notes): Void — Tutor menginput nilai dan catatan.
+3.8 Kelas Kuis (Interactive Quiz Entity)
+Mengelola kuis pilihan ganda interaktif berdurasi waktu.
+Atribut:
+- id: Integer (Primary Key) — ID kuis.
+- programName: String (Foreign Key) — Target program kelas.
+- title: String — Judul kuis.
+- questionsCount: Integer — Total nomor soal (1–10).
+- duration: String — Durasi batas waktu.
+- questionsJSON: Text — Struktur JSON array pertanyaan, opsi A/B/C, dan kunci jawaban.
+Metode (Operations):
++ calculateScore(userAnswersArray): Integer — Mengkalkulasi skor otomatis dengan rumus:
+3.9 Kelas Nilai (Academic Grade Record Entity)
+Mencatat rekapitulasi riwayat pencapaian akademik harian/periodik siswa.
+Atribut:
+- id: Integer (Primary Key) — ID catatan nilai.
+- studentId: Integer (Foreign Key) — Referensi ke Siswa.
+- taskName: String — Nama kuis atau tugas.
+- score: Integer — Nilai angka (0–100).
+- gradeLetter: String — Predikat huruf ('A', 'B', 'C').
+- notes: String — Catatan perkembangan belajar.
+Metode (Operations):
++ calculateLetter(score): String — Evaluasi predikat huruf:
+4. Matriks Hubungan & Kardinalitas (Relationship Matrix)
+| Kelas Asal | Kelas Tujuan | Jenis Hubungan | Kardinalitas | Keterangan |
+| OrangTua | Siswa | Association | 1 : 1..* | 1 Orang Tua dapat memiliki 1 atau lebih profil anak terdaftar. |
+| Program | Siswa | Association | 1 : 0..* | 1 Program dapat diikuti oleh banyak Siswa. |
+| Siswa | Pembayaran | Composition | 1 : 0..* | Setiap data Pembayaran terikat pada 1 Siswa. |
+| Program | Modul | Aggregation | 1 : 0..* | Modul dikelompokkan berdasarkan Program kelas. |
+| Program | Kuis | Aggregation | 1 : 0..* | Kuis terikat dengan target Program kelas. |
+| Program | Tugas | Aggregation | 1 : 0..* | Tugas terikat dengan target Program kelas. |
+| Tugas | Submisi | Association | 1 : 0..* | 1 Tugas dapat menerima banyak Submisi dari siswa berbeda. |
+| Siswa | Submisi | Association | 1 : 0..* | Siswa dapat mengirimkan banyak Submisi jawaban. |
+| Siswa | Nilai | Composition | 1 : 0..* | Rekap Nilai terikat secara permanen pada profil Siswa. |
+
+--- Dokumen SRS Bimbel Grase.docx ---
+Software Requirements Specification (SRS)
+Sistem Informasi Manajemen, Portofolio Orang Tua & E-Learning Bimbel Grase
+Versi: 1.0.0
+Tanggal: 7 Agustus 2026
+Status: Draf Final
+1. Pendahuluan
+1.1 Tujuan Dokumen
+Dokumen Software Requirements Specification (SRS) ini bertujuan untuk mendefinisikan secara menyeluruh kebutuhan perangkat lunak untuk sistem Aplikasi Bimbel Grase. Dokumen ini menjadi acuan utama bagi pengembang (developers), perancang sistem (UI/UX designers), quality assurance (QA), dan pemangku kepentingan (stakeholders) lembaga bimbingan belajar Bimbel Grase.
+1.2 Cakupan Sistem (Scope)
+Aplikasi Bimbel Grase adalah platform berbasis web terintegrasi yang mencakup:
+Portal Admin Pusat: Pengelolaan kelas, data siswa, unggah materi e-learning, kuis interaktif, pembuatan tugas LMS, input nilai, verifikasi bukti transfer pembayaran SPP, dan pelaporan keuangan.
+Portal Orang Tua (Parent Dashboard): Pendaftaran siswa baru multi-anak (multi-child), pertukaran profil anak aktif (child switcher), pembaruan foto profil, riwayat/pembayaran SPP, serta pemantauan perkembangan akademik anak.
+Sistem E-Learning (LMS): Pengaksesan modul PDF, pengerjaan kuis interaktif otomatis, pengunggahan jawaban tugas sekolah (assignment submissions), dan melihat hasil penilaian pengajar. Fitur e-learning dibatasi oleh sistem paywall hingga status pembayaran SPP siswa terkonfirmasi LUNAS.
+1.3 Definisi dan Singkatan
+SRS: Software Requirements Specification
+LMS: Learning Management System
+SPP: Sumbangan Pembinaan Pendidikan (Biaya Bulanan Bimbel)
+Paywall: Mekanisme pembatasan akses fitur e-learning berdasarkan status verifikasi pembayaran.
+Child Switcher: Fitur pertukaran profil anak aktif dalam 1 akun email orang tua.
+2. Deskripsi Umum (Overall Description)
+2.1 Perspektif Produk
+Aplikasi Bimbel Grase adalah aplikasi web mandiri (self-contained web application) berbasis arsitektur Single Page Application (SPA). Aplikasi ini menggabungkan fungsi administratif, portal informasi orang tua, dan ruang kelas digital berbasis Guided Discovery Learning.
++-------------------------------------------------------------------+|                        APLIKASI BIMBEL GRASE                      |+---------------------------------+---------------------------------+|          PORTAL ADMIN           |    PORTAL ORANG TUA & SISWA     || - Kelola Program & Kelas        | - Pendaftaran Multi-Anak        || - Kelola Data Siswa             | - Pertukaran Profil Anak        || - Upload Modul, Kuis & Tugas    | - Pembayaran SPP & Upload Bukti || - Verifikasi Pembayaran SPP     | - Akses LMS & Tugas Sekolah     || - Rekapitulasi Nilai & Laporan  | - Pengerjaan Kuis Interaktif    |+---------------------------------+---------------------------------+
+2.2 Klasifikasi & Karakteristik Pengguna
+Peran (Role)
+Deskripsi
+Hak Akses
+Guest / Tamu
+Calon orang tua/siswa yang mengunjungi situs web.
+Melihat Landing Page, Katalog Program Belajar, Form Pendaftaran Online, dan Form Login.
+Orang Tua / Siswa
+Wali murid yang memiliki 1 atau lebih anak terdaftar.
+Pengelolaan profil anak, pertukaran profil aktif, unggah foto anak, melihat tagihan & unggah bukti bayar, akses modul e-learning, kirim tugas, dan pengerjaan kuis.
+Admin Pusat
+Pengelola operasional dan staf pengajar Bimbel Grase.
+Akses Central Admin Console, CRUD Kelas, CRUD Siswa, Upload Modul, Buat Kuis & Tugas, Input Nilai, Verifikasi Pembayaran, Cetak Laporan.
+2.3 Lingkungan Operasional
+Client-side Browser: Google Chrome v100+, Mozilla Firefox v100+, Safari v15+, Microsoft Edge, serta Mobile Web Browsers (iOS Safari/Android Chrome).
+Responsive Design: Mendukung tampilan Desktop (resolusi ), Tablet (), dan Smartphone ().
+3. Fitur Sistem & Persyaratan Fungsional
+3.1 Modul Autentikasi & Manajemen Multi-Profil Anak
+FR-AUTH-001: Sistem harus menyediakan form masuk (login) menggunakan Email dan Password/Nomor WA.
+FR-AUTH-002: Sistem harus membedakan hak akses secara otomatis antara peran Admin dan Orang Tua berdasarkan kredensial yang dimasukkan.
+FR-AUTH-003: Sistem harus menyediakan mekanisme uji coba cepat (Quick Demo Access) untuk beralih antara Mode Orang Tua dan Mode Admin.
+FR-AUTH-004 (Fitur Tukar Anak): Sistem harus mendukung 1 akun Email Orang Tua untuk mengelola lebih dari 1 profil anak.
+FR-AUTH-005: Orang Tua dapat menambahkan profil anak baru kapan saja melalui portal profil anak.
+FR-AUTH-006: Orang Tua dapat mengubah foto profil untuk masing-masing anak melalui modal edit foto dengan pratinjau gambar secara langsung (image preview).
+3.2 Modul Pendaftaran Siswa Baru (Registration)
+FR-REG-001: Sistem menyediakan formulir pendaftaran online yang memuat:
+Data Orang Tua: Nama Lengkap, Nomor WhatsApp, Email.
+Data Anak: Nama Panggilan, Usia, dan Pilihan Program/Kelas.
+FR-REG-002: Formulir pendaftaran harus mendukung penginputan dinamis untuk menambah atau menghapus kartu data anak ke-2, ke-3, dst. dalam satu kali pengiriman.
+FR-REG-003: Setelah pendaftaran dikirim, sistem secara otomatis membuatkan akun orang tua dan mengarahkan pengguna ke halaman Pembayaran SPP awal.
+3.3 Modul Manajemen Tagihan & Verifikasi Keuangan (SPP)
+FR-PAY-001: Sistem harus menghitung secara otomatis total tagihan siswa berdasarkan rumus:(Catatan: Biaya Registrasi Rp 250.000 hanya dikenakan pada bulan pertama).
+FR-PAY-002: Sistem harus mendukung 3 status pembayaran: unpaid (Belum Bayar), pending (Menunggu Verifikasi Admin), dan verified (LUNAS).
+FR-PAY-003: Orang Tua dapat memilih metode pembayaran (Bank Transfer BCA / QRIS E-Wallet) dan mengunggah berkas bukti transfer (JPG, PNG, PDF).
+FR-PAY-004: Admin Pusat dapat melihat antrean verifikasi bukti bayar yang dilengkapi modal pratinjau nota transaksi otomatis (Canvas-generated receipt).
+FR-PAY-005: Admin Pusat memiliki hak untuk menyetujui (approve) bukti bayar, yang secara otomatis mengubah status siswa menjadi LUNAS.
+FR-PAY-006: Orang Tua yang telah berstatus LUNAS dapat memilih opsi pembayaran lanjutan untuk SPP bulan berikutnya.
+3.4 Modul E-Learning & LMS (Learning Management System)
+FR-LMS-001 (Paywall Lock): Konten E-Learning hanya dapat diakses jika status pembayaran siswa aktif adalah verified. Jika unpaid atau pending, sistem menampilkan pesan peringatan akses terkunci.
+FR-LMS-002 (Modul PDF): Sistem dapat menampilkan daftar modul belajar berbasis PDF yang diunggah Admin per kelas, lengkap dengan tombol unduh.
+FR-LMS-003 (Tugas LMS & Penyerahan):
+Siswa/Orang tua dapat melihat detail tugas aktif, materi PDF pengantar, tanggal pembukaan (opened date), dan batas tenggat (due date).
+Siswa dapat mengunggah berkas/foto jawaban tugas sekolah.
+Sistem menampilkan status pengerjaan: Belum Dikirim, Menunggu Penilaian, atau Sudah Dinilai beserta nilai angka dan catatan guru.
+FR-LMS-004 (Kuis Interaktif):
+Siswa dapat mengerjakan kuis pilihan ganda berbasis batas waktu (timer).
+Sistem menghitung skor kuis secara otomatis dengan rumus:
+Sistem memberikan imbalan bintang visual (reward system) serta menyimpan skor kuis ke dalam rekapitulasi nilai siswa.
+3.5 Modul Administrator Console (Admin Pusat)
+FR-ADM-001 (Dashboard KPI): Menampilkan ringkasan operasional berupa Total Kelas Aktif, Total Siswa Terdaftar, Total Berkas Modul/Kuis, dan Total Pendapatan SPP Terverifikasi.
+FR-ADM-002 (Kelola Kelas): Admin dapat menambah program/kelas baru dengan parameter: Nama Program, Target Usia, Tutor, Jadwal, Biaya SPP, dan Deskripsi.
+FR-ADM-003 (Kelola Siswa): Admin dapat melihat tabel siswa, melakukan pencarian berdasarkan nama siswa/orang tua, menambah siswa secara manual, dan melihat detail kontak.
+FR-ADM-004 (Pembuat Kuis Dinamis): Admin dapat membuat kuis baru dengan menentukan jumlah soal dinamis (1–10 soal), pilihan opsi A/B/C, durasi waktu, dan kunci jawaban benar.
+FR-ADM-005 (Penilaian Tugas & Input Nilai): Admin dapat memeriksa berkas tugas siswa yang diunggah, memberikan nilai angka (0-100), sistem otomatis menentukan predikat huruf (A/B/C), serta menyertakan catatan pengajar.
+FR-ADM-006 (Pelaporan & Ekspor Data): Admin dapat melihat laporan akademik siswa, rekapitulasi transaksi SPP, serta melakukan simulasi ekspor laporan PDF.
+4. Persyaratan Antarmuka Eksternal
+4.1 Antarmuka Pengguna (UI/UX Guidelines)
+Skema Warna (Material Design 3):
+Primary: Teal/Tosca (#006a6a)
+Secondary: Warm Gold/Amber (#7c5800 / #feb700)
+Surface Background: Soft Mint Tint (#f4fbfa)
+Error/Alert: Rose/Red (#ba1a1a / #rose-600)
+Tipografi:
+Headline/Judul: Google Font Quicksand (Bold/Semi-bold).
+Teks Bodi/Form: Google Font Nunito Sans (Regular/Bold).
+Ikonografi: Google Material Symbols Outlined (material-symbols-outlined).
+Sistem Notifikasi: Floating Toast Notification di pojok kanan atas untuk memberi umpan balik instan (feedback) aksi pengguna.
+4.2 Antarmuka Perangkat Lunak & Komunikasi
+Protokol: HTTPS untuk seluruh jalur komunikasi data.
+Integrasi Eksternal: WhatsApp Web API (tautan dinamis wa.me untuk bantuan CS), Unsplash API (placeholder foto profil & thumbnail).
+5. Persyaratan Non-Fungsional (Non-Functional Requirements)
+5.1 Keamanan (Security)
+NFR-SEC-001: Seluruh input formulir harus divalidasi di tingkat klien (client-side validation) untuk tipe data, required field, serta ekstensi berkas yang diunggah (MIME type image/pdf).
+NFR-SEC-002: Pembatasan hak akses halaman e-learning berdasarkan pemeriksaan status autentikasi dan status verifikasi bayar.
+5.2 Performa (Performance)
+NFR-PER-001: Aplikasi berbasis arsitektur SPA (Single Page Application) dengan transisi halaman antarmuka cepat tanpa full page reload.
+NFR-PER-002: Rendering grafik nota transfer dan pratinjau gambar foto profil diproses di sisi klien menggunakan HTML5 Canvas API untuk mengurangi beban server-side.
+5.3 Kemudahan Penggunaan (Usability)
+NFR-USE-001: Navigasi responsif dengan dukungan Bottom Navigation / Mobile Menu pada perangkat smartphone.
+NFR-USE-002: Proses alur pendaftaran hingga pembayaran dapat diselesaikan dalam kurang dari 3 langkah utama.
+6. Model Data & Struktur Entitas
++------------------+         +------------------+         +------------------+|      USER        | 1     N |     STUDENT      | N     1 |     PROGRAM      |+------------------+---------+------------------+---------+------------------+| - parentEmail    |         | - id             |         | - id             || - parentName     |         | - studentName    |         | - name           || - parentPhone    |         | - age            |         | - targetAge      |+------------------+         | - avatar         |         | - fee            |                             | - paymentStatus  |         | - tutor          |                             +------------------+         +------------------+                                  |        |                                  | 1      | 1                                  |        |                                  | N      | N                             +----+--+   +-+----------------+                             |SUBMIS.|   |      GRADE       |                             +-------+   +------------------+                             | - score   | - taskName       |                             | - file    | - score          |                             | - status  | - gradeLetter    |                             +-------+   +------------------+
+Detail Entitas Utama:
+User / Parent: parentEmail (PK), parentName, parentPhone.
+Student: id (PK), studentName, age, program (FK), paymentStatus ('unpaid'|'pending'|'verified'), billingPeriod, receiptFileName, receiptFileData, avatar.
+Program / Class: id (PK), name, targetAge, tutor, schedule, fee, desc.
+Assignment: id (PK), title, program (FK), pdfTitle, pdfFileName, openedDate, dueDate, highlightText, instructions.
+Submission: id (PK), assignmentId (FK), studentId (FK), submittedFile, submittedAt, status ('submitted'|'graded'), score, notes.
+Quiz: id (PK), title, program (FK), questionsCount, duration, questions (JSON Array: text, options, key).
+Grade: id (PK), studentId (FK), taskName, score, gradeLetter ('A'|'B'|'C'), notes.
+
+--- Dokumen Use Case & Skenario Bimbel Grase.docx ---
+Dokumen Spesifikasi Use Case & Skenario Use Case
+Sistem Informasi Manajemen, Portofolio Orang Tua & E-Learning Bimbel Grase
+Versi Dokumen: 1.0.0
+Tanggal: 7 Agustus 2026
+Disusun Oleh: System Analyst / Software Engineering Team Bimbel Grase
+Status: Draf Final Spesifikasi Kebutuhan Pengguna
+1. Pendahuluan & Identifikasi Aktor
+Dokumen ini menjelaskan diagram hubungan dan skenario detail dari penggunaan aplikasi Bimbel Grase. Berdasarkan analisis operasional, sistem ini memfasilitasi 4 (empat) peranan/aktor utama:
+|
+| Aktor | Deskripsi Peran & Responsibilitas | Hak Akses Utama |
+| Orang Tua / Wali | Orang tua yang mendaftarkan satu atau beberapa anak ke Bimbel Grase. | Pendaftaran online, manajemen multi-anak (Child Switcher), unggah foto anak, pembayaran SPP, serta pemantauan tugas/kuis anak. |
+| Siswa / Ananda | Anak yang terdaftar dalam program bimbingan belajar Bimbel Grase. | Mengakses materi modul PDF, mengerjakan kuis harian interaktif, dan mengunggah lembar jawaban tugas sekolah. |
+| Admin Pusat | Staf operasional & keuangan lembaga Bimbel Grase. | Pengelolaan penuh (Central Console), CRUD Kelas, CRUD Siswa, verifikasi pembayaran SPP, serta ekspor laporan keuangan/akademik. |
+| Tutor / Pengajar | Pengajar yang bertanggung jawab atas kelas dan materi akademik. | Membuat tugas LMS, mengunggah modul PDF, mempublikasikan kuis interaktif, dan memeriksa/memberikan nilai submisi tugas siswa. |
+2. Diagram Use Case (Use Case Diagram)
+Berikut adalah batas sistem (System Boundary) Aplikasi Bimbel Grase beserta hubungan interaksi aktor dengan Use Case:
++-------------------------------------------------------------------------------------------------------------------------+|                                              SYSTEM BOUNDARY: APLIKASI BIMBEL GRASE                                     ||                                                                                                                         ||       ORANG TUA                                                                                                         ||       (PARENT)                                                                                                          ||          o        -------- ( UC-01: Mendaftar Akun & Multi-Anak )                                                       ||         /|\       -------- ( UC-02: Kelola Profil & Tukar Anak ) <<include>> ----> ( UC-03: Ubah Foto Profil )          ||         / \       -------- ( UC-04: Bayar SPP & Unggah Bukti )                                                          ||                   -------- ( UC-05: Mengakses LMS & Modul PDF ) --<<include>>---> ( UC-06: Verifikasi Paywall Status ) ||                                                                                              ^                          ||                                                                                              | <<extend>>               ||       SISWA       -------- ( UC-07: Mengerjakan Kuis Interaktif ) ---------------------------+                          ||      (STUDENT)    -------- ( UC-08: Unggah Jawaban Tugas LMS )   ---------------------------+                          ||          o                                                                                                              ||         /|\                                                                                                             ||         / \                                                                                                             ||                                                                                                                         ||       TUTOR /     -------- ( UC-09: Upload Modul Belajar PDF )                                                          ||       PENGAJAR    -------- ( UC-10: Publikasikan Kuis Interaktif )                                                      ||          o        -------- ( UC-11: Buat Lembar Tugas LMS )                                                             ||         /|\       -------- ( UC-12: Evaluasi & Input Nilai Submisi )                                                    ||         / \                                                                                                             ||                                                                                                                         ||       ADMIN       -------- ( UC-13: Kelola Program & Kelas )                                                            ||       PUSAT       -------- ( UC-14: Kelola Data Siswa & Wali )                                                          ||          o        -------- ( UC-15: Verifikasi Bukti Bayar & Unlock Paywall )                                           ||         /|\       -------- ( UC-16: Cetak Laporan Keuangan & Akademik )                                                 ||         / \                                                                                                             |+-------------------------------------------------------------------------------------------------------------------------+
+3. Daftar Matriks Use Case
+| Kode UC | Nama Use Case | Aktor Utama | Deskripsi Ringkas |
+| UC-01 | Registrasi Akun & Multi-Anak | Orang Tua | Mendaftarkan akun wali baru beserta 1 atau lebih data anak dalam satu formulir. |
+| UC-02 | Kelola Profil & Tukar Anak | Orang Tua | Menukar konteks anak aktif (Active Child Switcher) yang dipantau di portal. |
+| UC-03 | Ubah Foto Profil Anak | Orang Tua | Mengunggah foto profil terbaru untuk anak aktif melalui modal pratinjau. |
+| UC-04 | Pembayaran SPP & Upload Bukti | Orang Tua | Melihat rincian tagihan SPP dan mengunggah bukti transfer transfer/QRIS. |
+| UC-05 | Mengakses LMS & Modul PDF | Orang Tua / Siswa | Membuka ruang e-learning untuk membaca dan mendownload materi modul PDF. |
+| UC-06 | Verifikasi Paywall Status | Sistem | Memeriksa status pembayaran verified sebelum mengizinkan akses ke LMS. |
+| UC-07 | Mengerjakan Kuis Interaktif | Siswa | Memilih jawaban soal kuis berdurasi waktu dan menerima skor otomatis. |
+| UC-08 | Unggah Jawaban Tugas LMS | Siswa / Orang Tua | Mengirim berkas/foto lembar jawaban tugas sebelum batas due date. |
+| UC-09 | Upload Modul Belajar PDF | Tutor / Admin | Mengunggah materi PDF baru yang ditargetkan ke program kelas tertentu. |
+| UC-10 | Publikasikan Kuis Interaktif | Tutor / Admin | Membuat soal pilihan ganda dinamis (1–10 soal) beserta kunci jawaban. |
+| UC-11 | Buat Lembar Tugas LMS | Tutor / Admin | Menerbitkan tugas baru lengkap dengan instruksi, lampiran PDF, dan batas waktu. |
+| UC-12 | Evaluasi & Input Nilai | Tutor / Admin | Memeriksa submisi tugas siswa, memberikan nilai angka (0-100) dan catatan. |
+| UC-13 | Kelola Program & Kelas | Admin Pusat | Menambah, mengedit, atau menghapus program bimbingan belajar dan tutor. |
+| UC-14 | Kelola Data Siswa & Wali | Admin Pusat | Melihat daftar seluruh siswa terdaftar, pencarian, dan penambahan manual. |
+| UC-15 | Verifikasi Bukti Pembayaran | Admin Pusat | Memeriksa foto nota transfer dan menyetujui (Approve) pembayaran SPP. |
+| UC-16 | Cetak Laporan & Ekspor PDF | Admin Pusat | Mengunduh rekapitulasi laporan akademik siswa dan keuangan transaksi SPP. |
+4. Skenario Use Case Terperinci (Detailed Use Case Scenarios)
+UC-01: Registrasi Akun & Multi-Anak (Orang Tua)
+ID Use Case: UC-01
+Nama Use Case: Registrasi Akun Orang Tua & Multi-Anak
+Aktor Utama: Orang Tua / Wali
+Deskripsi: Orang Tua mendaftarkan akun baru dan memasukkan 1 atau lebih data anak ke dalam sistem dalam satu kali pengiriman formulir.
+Prasyarat (Pre-conditions): Orang Tua belum masuk (logged in) ke dalam sistem.
+Kondisi Akhir (Post-conditions): Akun Orang Tua terbentuk, data anak tersimpan dengan status pembayaran unpaid, dan sistem mengarahkan ke halaman Pembayaran SPP Awal.
+Alur Utama (Main Flow):
+Orang Tua membuka halaman landing page dan menekan tombol "Daftar Sekarang".
+Sistem menampilkan Formulir Pendaftaran Online (Bagian 1: Data Orang Tua, Bagian 2: Data Ananda).
+Orang Tua mengisikan Nama Lengkap, Nomor WhatsApp, dan Email.
+Orang Tua mengisikan data anak ke-1 (Nama Panggilan, Usia, dan Pilihan Program Kelas).
+(Opsional) Orang Tua menekan tombol "+ Tambah Anak Lain" untuk menambah kartu data anak ke-2/ke-3.
+Orang Tua menekan tombol "Kirim Pendaftaran & Buat Akun".
+Sistem memvalidasi kelengkapan input formulir.
+Sistem menyimpan data Orang Tua dan data anak-anak ke dalam penyimpanan (state/database).
+Sistem mengeset status autentikasi pengguna menjadi isLoggedIn = true dan peran parent.
+Sistem menampilkan notifikasi toast sukses dan mengarahkan pengguna ke View Pembayaran SPP.
+Alur Alternatif (Alternative Flow):
+4a. Input Formulir Tidak Lengkap / Email Salah Format:
+Sistem menolak pengiriman formulir.
+Sistem menampilkan pesan peringatan di browser untuk melengkapi area input wajib (required fields).
+Orang Tua memperbaiki input data dan kembali ke Langkah 6.
+UC-04: Pembayaran SPP & Unggah Bukti Bayar (Orang Tua)
+ID Use Case: UC-04
+Nama Use Case: Pembayaran SPP Bulanan & Unggah Bukti Transfer
+Aktor Utama: Orang Tua
+Deskripsi: Orang Tua melihat rincian kalkulasi biaya SPP (termasuk biaya pendaftaran jika bulan ke-1) dan mengunggah berkas bukti pembayaran.
+Prasyarat (Pre-conditions): Orang Tua telah login dan memilih profil anak yang hendak dibayar tagihannya.
+Kondisi Akhir (Post-conditions): Status pembayaran anak berubah dari unpaid menjadi pending, dan berkas bukti bayar terkirim ke antrean verifikasi admin.
+Alur Utama (Main Flow):
+Orang Tua membuka menu "Pembayaran".
+Sistem menampilkan rincian tagihan berdasarkan formula:(Biaya registrasi Rp 250.000 hanya dihitung pada bulan ke-1).
+Orang Tua memilih metode pembayaran (Transfer Bank BCA / QRIS E-Wallet).
+Orang Tua melakukan transfer sesuai nominal total.
+Orang Tua menekan area "Upload file atau foto bukti transfer" dan memilih file gambar/PDF dari perangkat.
+Sistem memuat nama berkas dan mengonversi data gambar (FileReader DataURL).
+Orang Tua menekan tombol "Kirim Bukti Pembayaran".
+Sistem memperbarui status pembayaran anak menjadi pending.
+Sistem memperbarui antarmuka pengguna dengan menampilkan badge peringatan "Menunggu Konfirmasi dari Admin".
+UC-15: Verifikasi Bukti Pembayaran & Unlock Paywall (Admin Pusat)
+ID Use Case: UC-15
+Nama Use Case: Verifikasi Bukti Pembayaran & Pembukaan Paywall Access
+Aktor Utama: Admin Pusat
+Deskripsi: Admin Pusat memeriksa bukti pembayaran yang diunggah Orang Tua dan menyetujui transaksi untuk membuka pembatasan fitur LMS (Paywall Lock).
+Prasyarat (Pre-conditions): Terdapat tagihan siswa yang berstatus pending pada antrean verifikasi admin.
+Kondisi Akhir (Post-conditions): Status pembayaran siswa berubah menjadi verified (LUNAS) dan hak akses E-Learning siswa terbuka secara otomatis.
+Alur Utama (Main Flow):
+Admin Pusat masuk ke Dashboard Admin dan memilih tab "Menu Laporan Keuangan".
+Sistem menampilkan daftar antrean transaksi berstatus pending.
+Admin menekan tombol "Lihat Bukti Transfer" pada entri siswa terkait.
+Sistem menampilkan Modal Bukti Pembayaran yang merender nota digital HTML5 Canvas secara real-time.
+Admin memeriksa keabsahan nominal dan nama pengirim transfer.
+Admin menekan tombol "Verifikasi Lunas (Approve)".
+Sistem mengubah paymentStatus siswa menjadi verified.
+Sistem meng-unblock PaywallGuard pada akun siswa/orang tua yang bersangkutan.
+Sistem memperbarui total indikator Pendapatan SPP Terverifikasi pada Dashboard Admin.
+Alur Alternatif (Alternative Flow):
+5a. Bukti Bayar Tidak Valid / Nominal Kurang:
+Admin menolak transaksi atau menghubungi Orang Tua via kontak WhatsApp yang tertera di tabel.
+Status pembayaran tetap pending atau dikembalikan ke unpaid.
+UC-07: Mengerjakan Kuis Interaktif (Siswa)
+ID Use Case: UC-07
+Nama Use Case: Mengerjakan Kuis Interaktif & Perhitungan Skor Otomatis
+Aktor Utama: Siswa
+Deskripsi: Siswa memilih dan menjawab pertanyaan kuis pilihan ganda interaktif berbatas waktu, serta memperoleh hasil skor kelulusan secara langsung.
+Prasyarat (Pre-conditions): Status pembayaran siswa adalah verified (Paywall terbuka) dan terdapat kuis aktif pada program kelas siswa.
+Kondisi Akhir (Post-conditions): Skor kuis terhitung, predikat huruf (A/B/C) dihasilkan, dan hasil tersimpan ke dalam rekapitulasi nilai siswa (Grade Record).
+Alur Utama (Main Flow):
+Siswa/Orang Tua membuka menu "E-Learning" dan menuju ke area Kuis Interaktif Harian.
+Siswa menekan tombol "Mulai Kuis" pada judul kuis pilihan.
+Sistem menampilkan modal pengerjaan kuis yang berisi daftar soal pilihan ganda (Opsi A, B, C) beserta petunjuk durasi waktu.
+Siswa memilih satu opsi jawaban untuk setiap nomor soal.
+Siswa menekan tombol "Selesaikan & Kirim Jawaban".
+System Engine Kuis menghitung total jawaban benar dan mengkalkulasi skor menggunakan rumus:
+Sistem menentukan predikat kelulusan (Grade Letter):
+Skor 
+Skor 
+Sistem menyembunyikan layar soal dan menampilkan Layar Hasil Kuis berisi Skor Akhir dan imbalan ikon bintang.
+Sistem menyimpan data nilai ke entitas GRADE.
+UC-08 & UC-12: Unggah & Penilaian Tugas LMS (Siswa & Tutor)
+ID Use Case: UC-08 & UC-12
+Nama Use Case: Unggah Lembar Jawaban Tugas & Penilaian Pengajar
+Aktor Utama: Siswa / Orang Tua (Pengirim) & Tutor / Admin (Penilai)
+Deskripsi: Siswa mengunggah jawaban tugas sekolah berbasis PDF/foto, kemudian Tutor memeriksa berkas tersebut dan menginputkan nilai angka beserta evaluasi.
+Prasyarat (Pre-conditions): Terdapat tugas LMS aktif yang diterbitkan oleh Tutor.
+Kondisi Akhir (Post-conditions): Jawaban tersimpan dengan status submitted, lalu diperbarui menjadi graded setelah Tutor memberikan nilai.
+Alur Utama (Main Flow):
+Siswa membuka menu "E-Learning" dan melihat modul/tugas aktif.
+Siswa menekan tombol "Unggah Jawaban Tugas".
+Siswa memilih file lembar jawaban (PDF/Gambar) dan menekan tombol "Kirim Tugas".
+Sistem menyimpan berkas ke entitas SUBMISSION dengan status submitted.
+Tutor/Admin masuk ke Admin Console  "Modul & Kuis per Kelas"  "Tugas LMS".
+Tutor menekan tombol "Periksa & Nilai" pada daftar submisi siswa.
+System menampilkan berkas yang diunggah siswa dan menyediakan form input nilai.
+Tutor mengisikan Nilai Angka (0-100) dan Catatan Pengajar (contoh: "Pengerjaan sangat rapi dan lengkap").
+Tutor menekan tombol "Simpan Nilai Tugas".
+Sistem mengubah status submisi menjadi graded dan mencatatkan nilai ke portal orang tua.
+UC-02: Pertukaran Profil Anak / Child Switcher (Orang Tua)
+ID Use Case: UC-02
+Nama Use Case: Pertukaran Profil Anak Aktif (Child Switcher)
+Aktor Utama: Orang Tua
+Deskripsi: Orang Tua yang memiliki lebih dari 1 anak terdaftar dapat menukar profil anak aktif untuk memantau status tagihan dan e-learning secara terpisah.
+Prasyarat (Pre-conditions): Akun Orang Tua memiliki minimal 2 profil anak terdaftar.
+Kondisi Akhir (Post-conditions): Penunjuk activeChildIndex diperbarui, dan seluruh tampilan antarmuka (Dashboard, SPP, LMS) menyesuaikan dengan data anak terpilih.
+Alur Utama (Main Flow):
+Orang Tua membuka menu "Profil Anak" atau menekan Avatar Header.
+Sistem menampilkan daftar kartu profil anak yang terhubung dengan akun email Orang Tua.
+Kartu anak yang sedang aktif ditandai dengan batas ring berwarna hijau/toska dan status badge "Aktif".
+Orang Tua menekan tombol "Pilih" pada kartu anak ke-2.
+Sistem memperbarui penunjuk indeks appState.activeChildIndex.
+Sistem memicu pemicu pembaruan UI (updateUIState()).
+Sistem menampilkan notifikasi toast: "Profil ditukar ke".
+Seluruh konten pada Dashboard, Status Tagihan SPP, dan Modul LMS otomatis berganti menyesuaikan data anak yang baru dipilih.
+UC-10: Publikasikan Kuis Interaktif Baru (Tutor / Admin)
+ID Use Case: UC-10
+Nama Use Case: Pembuat Kuis Dinamis & Publikasi Kelas
+Aktor Utama: Tutor / Admin Pusat
+Deskripsi: Admin/Tutor membuat kuis baru dengan menentukan jumlah soal dinamis (1–10 soal), mengisikan opsi A/B/C, dan menetapkan kunci jawaban benar.
+Prasyarat (Pre-conditions): Admin/Tutor telah masuk ke dalam Mode Admin Console.
+Kondisi Akhir (Post-conditions): Kuis baru terpublikasi dan langsung muncul di tab E-Learning siswa pada kelas target.
+Alur Utama (Main Flow):
+Admin/Tutor memilih tab "Modul & Kuis per Kelas" pada Admin Console.
+Admin/Tutor menekan tombol "+ Buat Kuis".
+Sistem menampilkan Modal Buat Kuis Interaktif Baru.
+Admin mengisikan Judul Kuis, Target Program Kelas, Jumlah Soal (1–10), dan Durasi (Menit).
+Sistem merender form input pertanyaan & opsi jawaban secara dinamis sesuai jumlah soal yang diinputkan.
+Admin mengisikan Teks Pertanyaan, Opsi A, Opsi B, Opsi C, serta memilih Kunci Jawaban Benar (A/B/C) untuk masing-masing soal.
+Admin menekan tombol "+ Publikasikan Kuis".
+Sistem menyimpan struktur objek JSON Kuis ke dalam array appState.quizzes.
+Sistem menampilkan notifikasi toast sukses dan memperbarui antarmuka E-Learning siswa.
+5. Matriks Keterlacakan Use Case dengan BRD & SRS
+| Kode Use Case | Kebutuhan Bisnis (BRD) | Persyaratan Fungsional (SRS) | Komponen SDD / DPPL |
+| UC-01 | BRD-02 (Multi-Child) | FR-REG-001, FR-REG-002 | AuthModule, handleRegistrationSubmit() |
+| UC-02 | BRD-02 (Multi-Child) | FR-AUTH-004 | AuthModule, selectActiveChild() |
+| UC-03 | BRD-02 (Multi-Child) | FR-AUTH-006 | ParentPortalModule, handlePhotoUpload() |
+| UC-04 | BRD-01 (Rekapitulasi SPP) | FR-PAY-001, FR-PAY-003 | PaymentModule, submitPaymentProof() |
+| UC-05, UC-06 | BRD-03 (Paywall Lock) | FR-LMS-001, FR-LMS-002 | LMSModule, PaywallGuard |
+| UC-07 | BRD-04 (Kuis Interaktif) | FR-LMS-004 | LMSModule, startQuiz(), submitQuiz() |
+| UC-08, UC-12 | BRD-05 (Tugas & Penilaian) | FR-LMS-003, FR-ADM-005 | LMSModule, AdminModule (saveGradeForSubmission) |
+| UC-09, UC-10, UC-11 | BRD-06 (Central Console) | FR-ADM-002, FR-ADM-004 | AdminModule (handleAddQuizSubmit) |
+| UC-13, UC-14 | BRD-06 (Central Console) | FR-ADM-001, FR-ADM-003 | AdminModule (refreshAdminData) |
+| UC-15 | BRD-01 (Canvas Receipt) | FR-PAY-004, FR-PAY-005 | PaymentModule, generateMockReceiptImage() |
+| UC-16 | BRD-06 (Central Console) | FR-ADM-006 | AdminModule, exportReport() |
+
+--- Software Design Description (SDD) Bimbel Grase.docx ---
+Software Design Description (SDD) / Desain Perancangan Perangkat Lunak (DPPL)
+Sistem Informasi Manajemen, Portofolio Orang Tua & E-Learning Bimbel Grase
+Versi Dokumen: 1.0.0
+Tanggal: 7 Agustus 2026
+Disusun Oleh: Senior Software Architect / Tim Development Bimbel Grase
+Status: Draf Final Perancangan Teknis
+1. Pendahuluan
+1.1 Tujuan Dokumen
+Dokumen Software Design Description (SDD) ini mendeskripsikan perancangan arsitektur, struktur komponen, skema basis data, dan antarmuka teknis untuk Aplikasi Bimbel Grase. Dokumen ini menjadi acuan teknis bagi tim pengembang (software engineers), perancang basis data (database administrators), dan penguji sistem (QA engineers) dalam tahap implementasi kode.
+1.2 Cakupan Sistem
+Sistem dirancang sebagai aplikasi web berbasis Single Page Application (SPA) modular yang mengintegrasikan:
+Client-Side Presentation Layer: Antarmuka responsif berbasis HTML5, Tailwind CSS, dan Vanilla JavaScript State Engine.
+Business Logic & State Engine: Pengelolaan sesi autentikasi, pertukaran profil anak (Child Switcher), perhitungan tagihan SPP, Paywall Lock, dan engine kuis interaktif.
+Data Storage & Data Structure Layer: Pengelolaan model entitas relasional untuk data Pengguna, Siswa, Program/Kelas, Modul PDF, Tugas, Submisi, Kuis, dan Nilai.
+1.3 Acuan Dokumen
+BRD Bimbel Grase (Versi 1.0.0)
+SRS Bimbel Grase (Versi 1.0.0)
+2. Arsitektur Sistem (System Architecture)
+2.1 Ringkasan Arsitektur (High-Level Architecture)
+Aplikasi Bimbel Grase mengadopsi pola Single Page Application (SPA) Monolithic Client Engine dengan pemisahan komponen modular. Arsitektur ini dipilih untuk menjamin performa tinggi, transisi antarmuka tanpa full page reload, serta efisiensi penggunaan sumber daya server.
++---------------------------------------------------------------------------------+|                                 CLIENT BROWSER                                  ||                                                                                 ||  +---------------------------------------------------------------------------+  ||  |                           PRESENTATION LAYER (UI)                         |  ||  | - Header & Navigation Bar                                                 |  ||  | - View Routing Container (#main-content)                                  |  ||  |   ├─ Home View              ├─ Parent Dashboard    ├─ Admin Console       |  ||  |   ├─ Login View             ├─ E-Learning LMS      ├─ Finance & Verifier  |  ||  |   ├─ Registration View      └─ Payment View        └─ Modal Controllers   |  ||  +---------------------------------------------------------------------------+  ||                                       │                                         ||                                       ▼                                         ||  +---------------------------------------------------------------------------+  ||  |                        APPLICATION CORE & STATE ENGINE                    |  ||  | - Auth & Session Manager (Role Evaluator)                                 |  ||  | - Active Child Switcher State                                             |  ||  | - Paywall Authorization Guard                                             |  ||  | - Canvas Receipt Engine (HTML5 Canvas Rendering)                          |  ||  | - Interactive Quiz & Scoring Engine                                       |  ||  +---------------------------------------------------------------------------+  ||                                       │                                         ||                                       ▼                                         ||  +---------------------------------------------------------------------------+  ||  |                           DATA & STORAGE LAYER                            |  ||  | - Application In-Memory Store (appState)                                  |  ||  | - Synchronization Engine (syncStateWithAdmin)                             |  ||  | - Local Persistent Storage / REST API Bridge                              |  ||  +---------------------------------------------------------------------------+  |+---------------------------------------------------------------------------------+
+2.2 Teknologi Stack
+Frontend Framework/Library: HTML5, Tailwind CSS (v3 with Forms plugin), Vanilla JavaScript (ES6+ Native).
+Typography & Icons: Google Fonts (Quicksand & Nunito Sans), Google Material Symbols Outlined.
+Canvas API: HTML5 Canvas API untuk pembuatan nota/transkrip bayar secara real-time di sisi klien (Client-side Canvas Receipt Generation).
+Storage Protocol: JSON State In-Memory dengan sinkronisasi ke REST API / Local Storage.
+3. Perancangan Dekomposisi Komponen (Component Decomposition)
+Sistem dibagi menjadi 6 modul utama dengan tanggung jawab sebagai berikut:
++-----------------------------------------------------------------------------------+|                            DEKOMPOSISI KOMPONEN SISTEM                            |+-----------------------------------------------------------------------------------+                                         │        ┌───────────────────┬────────────┼────────────┬──────────────────┐        ▼                   ▼            ▼            ▼                  ▼┌──────────────┐   ┌──────────────┐ ┌──────────┐ ┌───────────┐   ┌───────────────┐│ Modul Auth   │   │ Modul Portal │ │  Modul   │ │   Modul   │   │  Modul Admin  ││ & Switcher   │   │  Orang Tua   │ │ Pembayaran│ │ E-Learning│   │    Console    │└──────────────┘   └──────────────┘ └──────────┘ └───────────┘   └───────────────┘
+3.1 Modul Autentikasi & Profile Switcher (AuthModule)
+switchView(viewId): Mengontrol navigasi antarmuka dan memblokir akses ke halaman terproteksi jika pengguna belum login.
+toggleAdminUserMode(): Mengubah konteks peran secara real-time antara parent dan admin.
+selectActiveChild(index): Memperbarui penunjuk indeks appState.activeChildIndex dan memicu pembaruan menyeluruh pada UI.
+3.2 Modul Portal Orang Tua (ParentPortalModule)
+renderChildrenCards(): Memuat daftar profil anak yang terhubung dengan akun orang tua.
+handlePhotoUpload(event) & handleEditChildPhotoSubmit(event): Memproses pengunggahan dan pembaruan foto profil anak via file reader dan live preview.
+3.3 Modul Tagihan & Pembayaran (PaymentModule)
+renderPaymentInteractionArea(): Menampilkan kondisi tagihan dinamis berdasarkan status (unpaid, pending, verified).
+submitPaymentProof(): Mengubah status menjadi pending dan mencatat lampiran bukti transfer.
+payNextMonthBill(): Menghasilkan episode penagihan baru untuk periode bulan berikutnya.
+3.4 Modul E-Learning LMS (LMSModule)
+PaywallGuard: Memeriksa status activeChild.paymentStatus. Jika tidak sama dengan verified, sistem memblokir tampilan LMS.
+renderParentLmsAssignments(): Memuat daftar tugas aktif, materi PDF pengantar, status pengiriman, dan penilaian dari tutor.
+startQuiz(quizId) & submitQuiz(e): Mengelola pengerjaan kuis interaktif berdurasi waktu, kalkulasi skor otomatis, dan penyimpanan hasil kuis.
+3.5 Modul Admin Console (AdminModule)
+refreshAdminData(): Memperbarui seluruh statistik KPI (Total Kelas, Total Siswa, Modul/Kuis, Total Pendapatan).
+adminVerifyPayment(id, status): Menyetujui (approve) transaksi pembayaran yang secara otomatis membuka Paywall Lock pada profil siswa bersangkutan.
+generateMockReceiptImage(item): Merender gambar nota bukti transfer menggunakan HTML5 Canvas 2D Context.
+4. Perancangan Basis Data & Model Data (Data Architecture)
+4.1 Diagram Hubungan Entitas (Entity Relationship Diagram - ERD)
+┌─────────────────┐       1:N       ┌─────────────────┐       N:1       ┌─────────────────┐│     USER        │─────────────────│     STUDENT     │─────────────────│     PROGRAM     │├─────────────────┤                 ├─────────────────┤                 ├─────────────────┤│ PK parentEmail  │                 │ PK id           │                 │ PK id           ││    parentName   │                 │ FK parentEmail  │                 │    name         ││    parentPhone  │                 │    studentName  │                 │    targetAge    │└─────────────────┘                 │    age          │                 │    tutor        │                                    │ FK program      │                 │    fee          │                                    │    paymentStatus│                 │    schedule     │                                    │    billingPeriod│                 └─────────────────┘                                    │    avatar       │                          │                                    └─────────────────┘                          │ 1:N                                      │           │                              │                             1:N      │           │     1:N                      ▼             ┌────────────────────────┘           └────────────────┐    ┌─────────────────┐             ▼                                                     ▼    │   ASSIGNMENT    │┌─────────────────┐                               ┌──────────────┐ │    ├─────────────────┤│   SUBMISSION    │                               │    GRADE     │ │    │ PK id           │├─────────────────┤                               ├──────────────┤ │    │ FK program      ││ PK id           │                               │ PK id        │ │    │    title        ││ FK assignmentId │                               │ FK studentId │ │    │    pdfTitle     ││ FK studentId    │                               │    taskName  │ │    │    openedDate   ││    submittedFile│                               │    score     │ │    │    dueDate      ││    submittedAt  │                               │    gradeLettr│ │    │    highlightText││    status       │                               │    notes     │ │    └─────────────────┘│    score        │                               └──────────────┘ │             ││    notes        │                                                │             │ 1:N└─────────────────┘                                                ▼             ▼                                                          ┌──────────────────────────────┐                                                          │             QUIZ             │                                                          ├──────────────────────────────┤                                                          │ PK id                        │                                                          │ FK program                   │                                                          │    title                     │                                                          │    questionsCount            │                                                          │    duration                  │                                                          │    questions (JSON)          │                                                          └──────────────────────────────┘
+4.2 Kamus Data (Data Dictionary)
+1. Entitas USER (Orang Tua / Wali)
+|
+| Nama Field | Tipe Data | Keterangan |
+| parentEmail | String (PK) | Email orang tua (kredensial login) |
+| parentName | String | Nama lengkap orang tua/wali |
+| parentPhone | String | Nomor WhatsApp aktif |
+2. Entitas STUDENT (Siswa Ananda)
+| Nama Field | Tipe Data | Keterangan |
+| id | Integer (PK) | Identifier unik siswa (Auto ID / Timestamp) |
+| parentEmail | String (FK) | Referensi ke akun orang tua |
+| studentName | String | Nama lengkap / panggilan anak |
+| age | String | Usia anak (contoh: "5 Tahun") |
+| program | String (FK) | Nama program kelas yang diikuti |
+| paymentStatus | Enum | Status SPP: 'unpaid', 'pending', 'verified' |
+| billingPeriod | String | Periode tagihan aktif (contoh: "Agustus 2026") |
+| billingCount | Integer | Jumlah bulan pembayaran yang telah dilakukan |
+| receiptFileName | String | Nama berkas bukti bayar yang diunggah |
+| receiptFileData | Text / Base64 | Data gambar bukti bayar (DataURL) |
+| avatar | String (URL) | URL/Base64 foto profil anak |
+3. Entitas PROGRAM (Kelas / Kursus)
+| Nama Field | Tipe Data | Keterangan |
+| id | Integer (PK) | ID unik program |
+| name | String | Nama program (contoh: "Super Calistung") |
+| targetAge | String | Target rentang usia siswa |
+| tutor | String | Nama pengajar / tutor penanggung jawab |
+| schedule | String | Hari dan jam pelaksanaan kelas |
+| fee | Integer | Nominal SPP bulanan (dalam Rupiah) |
+| desc | Text | Deskripsi singkat program |
+4. Entitas ASSIGNMENT (Tugas LMS)
+| Nama Field | Tipe Data | Keterangan |
+| id | Integer (PK) | ID unik penugasan |
+| program | String (FK) | Program kelas target |
+| title | String | Judul tugas/pertemuan |
+| pdfTitle | String | Nama modul PDF terkait |
+| pdfFileName | String | Nama berkas PDF materi |
+| openedDate | String | Tanggal dan waktu pembukaan tugas |
+| dueDate | String | Tenggat waktu penyerahan tugas |
+| highlightText | String | Instruksi utama / penekanan tugas |
+| instructions | Array (JSON) | Rincian langkah pengerjaan |
+5. Entitas SUBMISSION (Jawaban Tugas Siswa)
+| Nama Field | Tipe Data | Keterangan |
+| id | Integer (PK) | ID unik pengiriman tugas |
+| assignmentId | Integer (FK) | Referensi ke tugas terkait |
+| studentId | Integer (FK) | ID siswa yang mengunggah |
+| submittedFile | String | Nama berkas lembar jawaban |
+| submittedAt | String | Waktu pengunggahan |
+| status | Enum | Status tugas: 'submitted', 'graded' |
+| score | Integer | Nilai angka (0-100) |
+| notes | Text | Catatan dan evaluasi dari tutor |
+6. Entitas QUIZ (Kuis Interaktif)
+| Nama Field | Tipe Data | Keterangan |
+| id | Integer (PK) | ID unik kuis |
+| program | String (FK) | Program kelas target |
+| title | String | Judul kuis |
+| questionsCount | Integer | Total jumlah soal (1–10) |
+| duration | String | Durasi pengerjaan |
+| questions | JSON Array | Array soal: { id, text, options: {A, B, C}, key } |
+7. Entitas GRADE (Rekapitulasi Nilai)
+| Nama Field | Tipe Data | Keterangan |
+| id | Integer (PK) | ID unik catatan nilai |
+| studentId | Integer (FK) | ID siswa |
+| taskName | String | Nama kuis atau tugas |
+| score | Integer | Nilai angka (0–100) |
+| gradeLetter | String | Predikat huruf ('A', 'B', 'C') |
+| notes | Text | Evaluasi perkembangan akademik |
+5. Diagram Urutan (Sequence Diagrams)
+5.1 Sequence Diagram: Pendaftaran Online & Pembentukan Tagihan Initial
+[Orang Tua]              [Client SPA Engine]               [State / Database]     │                            │                                 │     │─── 1. Isi Form Register ──>│                                 │     │    (Data Ortu & Multi-Anak)│                                 │     │                            │─── 2. handleRegistrationSubmit ─>│     │                            │    (Set parentEmail & Name)     │     │                            │                                 │     │                            │─── 3. Inisialisasi Student List─>│     │                            │    (paymentStatus = 'unpaid')   │     │                            │                                 │     │                            │─── 4. Hitung Total Tagihan ────>│     │                            │    Total = Biaya Reg + SPP      │     │                            │                                 │     │<── 5. Redirect ke Payment ─│                                 │     │    (Tampilkan Breakdown)   │                                 │
+5.2 Sequence Diagram: Pengunggahan Bukti Bayar & Pembukaan Paywall oleh Admin
+[Orang Tua]     [Client SPA]      [Admin Console]      [System State]       [Paywall Guard]     │               │                   │                   │                     │     │── 1. Upload ─>│                   │                   │                     │     │   Bukti Bayar │                   │                   │                     │     │               │── 2. Submit ─────>│                   │                     │     │               │   Proof           │                   │                     │     │               │                   │── 3. Update status│                     │     │               │                   │   to 'pending' ──>│                     │     │               │                   │                   │                     │     │               │                   │── 4. Tinjau Bukti │                     │     │               │                   │   & Canvas Receipt│                     │     │               │                   │                   │                     │     │               │                   │── 5. Klik Approve │                     │     │               │                   │   (Lunas) ───────>│                     │     │               │                   │                   │── 6. Set status ───>│     │               │                   │                   │   'verified'        │     │               │                   │                   │                     │     │<──────────────┴───────────────────┴───────────────────┼── 7. Unlock Access ─│     │                        Akses E-Learning Terbuka       │   to LMS & Modul    │
+5.3 Sequence Diagram: Pengerjaan Kuis Interaktif & Perhitungan Skor
+[Siswa]                  [Quiz Engine (LMS)]                 [State / Database]   │                              │                                  │   │─── 1. Klik "Mulai Kuis" ────>│                                  │   │                              │─── 2. Fetch Questions (JSON) ───>│   │                              │<── 3. Render Modal & Timer ──────│   │                              │                                  │   │─── 4. Pilih Jawaban A/B/C ──>│                                  │   │─── 5. Klik "Selesaikan" ────>│                                  │   │                              │                                  │   │                              │─── 6. Kalkulasi Skor Otomatis ──>│   │                              │    Skor = (Benar / Total) * 100  │   │                              │                                  │   │                              │─── 7. Simpan ke Grade Record ───>│   │                              │    (Generate Predikat A/B/C)     │   │                              │                                  │   │<── 8. Tampilkan Result ──────│                                  │   │    (Skor & Imbalan Bintang)  │                                  │
+6. Algoritma Utama & Logika Bisnis
+6.1 Perhitungan Tagihan SPP Awal ()
+Sistem menghitung total pembayaran yang harus diselesaikan pada pendaftaran pertama dengan formula:
+Di mana:
+ (hanya dikenakan pada pendaftaran pertama / bulan ke-1).
+ (contoh: Super Calistung = ).
+Pada pembayaran bulan berikutnya (bulan ke-2 dst.), , sehingga:
+6.2 Perhitungan Skor Kuis & Penentuan Predikat
+Engine kuis menghitung nilai siswa menggunakan formula proporsional:
+Penentuan predikat kelulusan otomatis (Grade Letter) dievaluasi menggunakan logika ambang batas (threshold):
+6.3 Algoritma Render Nota Digital (HTML5 Canvas Engine)
+Proses pencetakan nota pembayaran pada sisi klien (Client-side Canvas Receipt Generation) dijalankan oleh fungsi generateMockReceiptImage(item) dengan tahapan logika:
+Membuat elemen <canvas> sementara ukuran .
+Mengisi latar belakang (background fill) dan header banner berwarna toska (#006a6a).
+Menggambar simbol centang status pendaftaran dan teks nominal transfer.
+Merender rincian atribut transaksi (Tanggal, Pengirim, Siswa, Program, No. Referensi).
+Menggambar garis putus-putus (dashed line border) sebagai batas nota.
+Mengonversi hasil gambar Canvas menjadi format DataURL (canvas.toDataURL()) untuk ditampilkan secara instan pada modal verifikasi admin maupun halaman profil orang tua.
+7. Perancangan Antarmuka Pengguna (UI Design System)
+7.1 Panduan Skema Warna (Material Design 3 Theme)
+Sistem menggunakan skema warna yang disesuaikan untuk menciptakan kesan ramah anak, profesional, dan modern:
+| Elemen UI | Nama Warna | Kode Hex | Visual Context |
+| Primary | Deep Tosca/Teal | #006a6a | Header, Tombol Utama, Akses Aktif |
+| Primary Container | Bright Teal | #2bb1b1 | Hover state tombol utama |
+| Secondary | Warm Amber / Gold | #7c5800 | Banner Kuis, Imbalan Bintang, Badge Admin |
+| Secondary Container | Gold Amber | #feb700 | Highlighting Kuis & Reward |
+| Surface Background | Soft Mint Tint | #f4fbfa | Latar belakang aplikasi |
+| Alert / Error | Crimson Rose | #ba1a1a | Warning SPP Belum Bayar & Pembatasan Paywall |
+| Success Status | Emerald Green | #059669 | Status LUNAS & Verifikasi Terkonfirmasi |
+7.2 Spesifikasi Tipografi
+Font Judul / Headline: Quicksand (Google Fonts) – Memberikan kesan fleksibel, modern, dan ramah anak.
+Font Bodi / Form: Nunito Sans (Google Fonts) – Menjamin keterbacaan (readability) yang tinggi pada teks berukuran kecil hingga sedang.
+8. Matriks Keterlacakan Kebutuhan (Traceability Matrix)
+Matriks ini memastikan seluruh kebutuhan bisnis (BRD) dan persyaratan fungsional (SRS) telah terakomodasi dalam perancangan perangkat lunak (SDD):
+| BRD Requirement | SRS Functional Requirement | SDD Component / Module | Metode Verifikasi |
+| BRD-01: Rekapitulasi SPP Terpusat & Canvas Receipt | FR-PAY-001, FR-PAY-004 | PaymentModule, generateMockReceiptImage() | pengujian pendaftaran & pratinjau nota |
+| BRD-02: Pengelolaan Multi-Anak | FR-AUTH-004, FR-AUTH-006 | AuthModule, ParentPortalModule | Uji coba Child Switcher & edit foto |
+| BRD-03: Paywall Lock Otomatis | FR-LMS-001 | LMSModule (PaywallGuard) | Pengujian pemblokiran E-learning saat unpaid |
+| BRD-04: Kuis Interaktif & Scoring | FR-LMS-004, FR-ADM-004 | LMSModule, AdminModule | Pengerjaan kuis & verifikasi skor otomatis |
+| BRD-05: Penyerahan & Penilaian Tugas | FR-LMS-003, FR-ADM-005 | LMSModule, AdminModule | Unggah tugas siswa & input nilai pengajar |
+| BRD-06: Central Admin Console | FR-ADM-001 s/d FR-ADM-006 | AdminModule (refreshAdminData) | Verifikasi ringkasan KPI & tabel data |
+
