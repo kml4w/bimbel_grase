@@ -27,13 +27,71 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // IMPORTANT: Avoid writing any logic between createServerClient and
-  // supabase.auth.getUser(). A simple mistake could make it very hard to debug
-  // issues with users being randomly logged out.
-
   const {
     data: { user },
   } = await supabase.auth.getUser()
+
+  const pathname = request.nextUrl.pathname
+  const isAdminRoute = pathname.startsWith('/admin')
+  const isTutorRoute = pathname.startsWith('/tutor')
+  const isParentRoute = pathname.startsWith('/parent')
+  const isDashboardRoute = pathname.startsWith('/dashboard')
+  const isAuthRoute = pathname === '/login' || pathname === '/register'
+
+  // If trying to access protected routes without being logged in
+  if (!user && (isAdminRoute || isTutorRoute || isParentRoute || isDashboardRoute)) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
+  }
+
+  // If logged in, handle role checks and redirects
+  if (user) {
+    // Only fetch role if it's a route that needs role evaluation to save DB queries
+    if (isAdminRoute || isTutorRoute || isParentRoute || isAuthRoute || pathname === '/') {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      
+      const role = profile?.role || 'student'
+
+      // Backlog 26: Route Protection
+      if (isAdminRoute && role !== 'admin') {
+        const url = request.nextUrl.clone()
+        url.pathname = role === 'tutor' ? '/tutor/modules' : role === 'parent' ? '/parent' : '/dashboard'
+        return NextResponse.redirect(url)
+      }
+
+      if (isTutorRoute && role !== 'tutor') {
+        const url = request.nextUrl.clone()
+        url.pathname = role === 'admin' ? '/admin/tutors' : role === 'parent' ? '/parent' : '/dashboard'
+        return NextResponse.redirect(url)
+      }
+
+      if (isParentRoute && role !== 'parent') {
+        const url = request.nextUrl.clone()
+        url.pathname = role === 'admin' ? '/admin/tutors' : role === 'tutor' ? '/tutor/modules' : '/dashboard'
+        return NextResponse.redirect(url)
+      }
+
+      // Backlog 27: Role-Based Redirection
+      // If hitting login/register or root path while already logged in
+      if (isAuthRoute || pathname === '/') {
+        const url = request.nextUrl.clone()
+        if (role === 'admin') url.pathname = '/admin/tutors'
+        else if (role === 'tutor') url.pathname = '/tutor/modules'
+        else if (role === 'parent') url.pathname = '/parent'
+        else url.pathname = '/dashboard'
+        
+        // Prevent redirect loop if already on the correct path
+        if (url.pathname !== pathname) {
+          return NextResponse.redirect(url)
+        }
+      }
+    }
+  }
 
   return supabaseResponse
 }

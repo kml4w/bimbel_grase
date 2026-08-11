@@ -1,0 +1,9 @@
+node_modules
+.next
+build
+dist
+public
+.env
+.env.local
+.env.*
+supabase/.temp
