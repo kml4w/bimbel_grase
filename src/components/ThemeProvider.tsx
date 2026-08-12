@@ -17,7 +17,6 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   }
 
   return (
-    // @ts-expect-error - React 19 type mismatch
     <NextThemesProvider {...props}>
       {children}
     </NextThemesProvider>
