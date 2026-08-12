@@ -29,6 +29,16 @@ export default async function ParentDashboardPage() {
   const hasStudents = students && students.length > 0
   const activeStudent = hasStudents ? students[0] : null // By default, show the first student
 
+  let latestQuiz = null
+  if (activeStudent) {
+    const { getStudentQuizzes } = await import('./elearning/actions')
+    const quizzesRes = await getStudentQuizzes(activeStudent.id)
+    if (quizzesRes.success && quizzesRes.data && quizzesRes.data.length > 0) {
+      const finishedQuizzes = quizzesRes.data.filter((q: any) => q.isFinished)
+      latestQuiz = finishedQuizzes.length > 0 ? finishedQuizzes[0] : quizzesRes.data[0]
+    }
+  }
+
   return (
     <section className="max-w-[1200px] mx-auto px-4 md:px-12 py-6 space-y-6">
       {/* HEADER SECTION */}
@@ -122,7 +132,7 @@ export default async function ParentDashboardPage() {
                 </span>
               </Link>
 
-              <div className="bg-white rounded-2xl p-5 ambient-shadow border border-surface-variant/80 hover:border-primary transition-all cursor-pointer group">
+              <Link href={activeStudent ? `/parent/elearning/${activeStudent.id}` : '#'} className="bg-white rounded-2xl p-5 ambient-shadow border border-surface-variant/80 hover:border-primary transition-all cursor-pointer group block">
                 <div className="w-10 h-10 rounded-full bg-secondary-container/30 text-secondary flex items-center justify-center mb-3">
                   <span className="material-symbols-outlined icon-fill">event</span>
                 </div>
@@ -131,16 +141,26 @@ export default async function ParentDashboardPage() {
                   {activeStudent?.program?.schedule || 'Belum diatur'}
                 </p>
                 <span className="text-[11px] text-outline mt-1 block group-hover:text-primary transition-colors">Lihat Jadwal Lengkap →</span>
-              </div>
+              </Link>
 
-              <div className="bg-white rounded-2xl p-5 ambient-shadow border border-surface-variant/80 hover:border-primary transition-all cursor-pointer group">
+              <Link href={latestQuiz ? `/parent/elearning/${activeStudent?.id}/quiz/${latestQuiz.id}` : activeStudent ? `/parent/elearning/${activeStudent.id}` : '#'} className="bg-white rounded-2xl p-5 ambient-shadow border border-surface-variant/80 hover:border-primary transition-all cursor-pointer group block">
                 <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
                   <span className="material-symbols-outlined icon-fill">military_tech</span>
                 </div>
-                <span className="text-xs font-bold text-on-surface-variant">Nilai Kuis Terakhir</span>
-                <p className="text-lg font-headline font-bold text-primary">A (95/100)</p>
-                <span className="text-[11px] text-outline mt-1 block group-hover:text-primary transition-colors">Cek E-Learning →</span>
-              </div>
+                <span className="text-xs font-bold text-on-surface-variant line-clamp-1" title={latestQuiz ? `Kuis: ${latestQuiz.title}` : 'Nilai Kuis Terakhir'}>
+                  {latestQuiz ? `Kuis: ${latestQuiz.title}` : 'Nilai Kuis Terakhir'}
+                </span>
+                <p className="text-lg font-headline font-bold text-primary">
+                  {latestQuiz?.isFinished 
+                    ? `${latestQuiz.gradeLetter || ''} (${latestQuiz.score}/100)` 
+                    : latestQuiz 
+                      ? 'Belum dikerjakan' 
+                      : 'Belum ada kuis'}
+                </p>
+                <span className="text-[11px] text-outline mt-1 block group-hover:text-primary transition-colors">
+                  {latestQuiz?.isFinished ? 'Lihat Hasil →' : latestQuiz ? 'Kerjakan Kuis →' : 'Cek E-Learning →'}
+                </span>
+              </Link>
             </div>
 
             {/* PAYWALL GUARD / E-LEARNING SECTION */}

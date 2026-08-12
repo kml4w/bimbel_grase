@@ -1,12 +1,18 @@
-import { getAdminKPIs } from './actions'
+import { getAdminKPIs, getEnrollmentStats } from './actions'
 import Link from 'next/link'
+import EnrollmentChart from '@/components/EnrollmentChart'
+import ClassStatsClient from './ClassStatsClient'
 
 export const metadata = {
   title: 'Dasbor Utama - Admin | Bimbel Grase',
 }
 
 export default async function AdminDashboardPage() {
-  const { data, success, message } = await getAdminKPIs()
+  const [kpiRes, enrollmentRes] = await Promise.all([
+    getAdminKPIs(),
+    getEnrollmentStats()
+  ])
+  const { data, success, message } = kpiRes
 
   // Format currency
   const formatRupiah = (number: number) => {
@@ -112,16 +118,31 @@ export default async function AdminDashboardPage() {
 
       </div>
 
+      {/* Siswa Aktif per Kelas */}
+      <div>
+        <h3 className="font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
+          <span className="material-symbols-outlined">group</span>
+          Siswa Aktif per Kelas
+        </h3>
+        <ClassStatsClient classStats={data.classStats || []} />
+      </div>
+
       {/* Quick Actions & Recent Activity (Placeholder) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-4">
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-surface-container-lowest border border-surface-variant/40 rounded-3xl p-6 h-full min-h-[300px]">
             <h3 className="font-bold text-lg text-on-surface mb-4 flex items-center gap-2">
               <span className="material-symbols-outlined">monitoring</span>
-              Grafik Pendaftaran (Segera Hadir)
+              Grafik Pendaftaran (6 Bulan Terakhir)
             </h3>
-            <div className="flex items-center justify-center h-[200px] bg-surface-container/30 rounded-2xl border border-dashed border-outline-variant">
-              <p className="text-on-surface-variant text-sm">Integrasi grafik pertumbuhan siswa akan muncul di sini.</p>
+            <div className="w-full h-[300px]">
+              {enrollmentRes.success && enrollmentRes.data ? (
+                <EnrollmentChart data={enrollmentRes.data} />
+              ) : (
+                <div className="flex items-center justify-center h-full bg-surface-container/30 rounded-2xl border border-dashed border-outline-variant text-error">
+                  <p className="text-sm">Gagal memuat grafik</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -14,6 +14,7 @@ type Student = {
   student_name: string
   age: number
   payment_status: string
+  billing_count?: number
   programs?: {
     id: string
     name: string
@@ -39,7 +40,8 @@ export default function StudentEditModal({ isOpen, onClose, student, programs, o
     student_name: '',
     age: 0,
     program_id: '',
-    payment_status: 'unpaid'
+    payment_status: 'unpaid',
+    billing_count: 1
   })
 
   useEffect(() => {
@@ -48,7 +50,8 @@ export default function StudentEditModal({ isOpen, onClose, student, programs, o
         student_name: student.student_name || '',
         age: student.age || 0,
         program_id: student.programs?.id || '',
-        payment_status: student.payment_status || 'unpaid'
+        payment_status: student.payment_status || 'unpaid',
+        billing_count: student.billing_count || 1
       })
     }
   }, [isOpen, student])
@@ -63,7 +66,12 @@ export default function StudentEditModal({ isOpen, onClose, student, programs, o
     e.preventDefault()
     setLoading(true)
 
-    const res = await updateStudent(student.id, formData)
+    const payload = {
+      ...formData,
+      billing_count: Number(formData.billing_count)
+    }
+
+    const res = await updateStudent(student.id, payload)
     
     setLoading(false)
     if (res.success) {
@@ -74,6 +82,7 @@ export default function StudentEditModal({ isOpen, onClose, student, programs, o
         student_name: formData.student_name,
         age: Number(formData.age),
         payment_status: formData.payment_status,
+        billing_count: Number(formData.billing_count),
         programs: selectedProgram ? { id: selectedProgram.id, name: selectedProgram.name } : student.programs
       })
       onClose()
@@ -174,6 +183,25 @@ export default function StudentEditModal({ isOpen, onClose, student, programs, o
                   <option value="pending">Menunggu Verifikasi (Pending)</option>
                   <option value="verified">Lunas (Verified)</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                  Bulan Tagihan Aktif (Billing Count)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    name="billing_count"
+                    value={formData.billing_count}
+                    onChange={handleChange}
+                    min="1"
+                    required
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-colors"
+                  />
+                  <div className="text-xs text-gray-500 w-32">
+                    Cth: 1 = Bulan 1, 2 = Bulan 2, dst.
+                  </div>
+                </div>
               </div>
             </div>
           </div>

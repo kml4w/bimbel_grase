@@ -274,3 +274,34 @@ export async function generateNextMonthBill(studentId: string) {
 
   return { success: true, message: 'Tagihan bulan berikutnya berhasil dibuat!' }
 }
+
+export async function deleteFinanceRecord(paymentId: string) {
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => cookieStore.getAll(),
+        setAll: () => {}
+      }
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, message: 'Harap masuk terlebih dahulu' }
+
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+  if (profile?.role !== 'admin') return { success: false, message: 'Forbidden' }
+
+  const { error } = await supabase
+    .from('payments')
+    .delete()
+    .eq('id', paymentId)
+
+  if (error) {
+    return { success: false, message: 'Gagal menghapus riwayat transaksi' }
+  }
+
+  return { success: true, message: 'Transaksi berhasil dihapus' }
+}

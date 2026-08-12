@@ -9,6 +9,7 @@ export default function Header({ user, profile }: { user: any, profile: any }) {
   const pathname = usePathname()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const role = profile?.role || null
   const isLoggedIn = !!user
@@ -132,19 +133,51 @@ export default function Header({ user, profile }: { user: any, profile: any }) {
 
       <div className="flex items-center gap-3">
         {isLoggedIn ? (
-          <>
-            <div className="hidden md:flex w-10 h-10 rounded-full overflow-hidden border-2 border-primary shadow-sm items-center justify-center bg-surface-container-high ring-2 ring-primary/20">
-              <span className="material-symbols-outlined text-primary">person</span>
-            </div>
+          <div className="relative">
             <button 
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="bg-error text-on-error px-4 py-2 rounded-xl text-sm font-bold hover:bg-error/80 transition-all flex items-center gap-1.5 shadow-md"
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex w-10 h-10 rounded-full overflow-hidden border-2 border-primary shadow-sm items-center justify-center bg-surface-container-high ring-2 ring-primary/20 hover:bg-surface-variant transition-colors"
             >
-              <span className="material-symbols-outlined text-[18px]">logout</span>
-              <span className="hidden sm:inline">Keluar</span>
+              <span className="material-symbols-outlined text-primary">person</span>
             </button>
-          </>
+
+            {isDropdownOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setIsDropdownOpen(false)}
+                ></div>
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-surface-variant py-2 flex flex-col z-50 ambient-shadow">
+                  <div className="px-4 py-3 border-b border-surface-variant/50 mb-2 bg-surface-container-lowest">
+                    <p className="text-sm font-bold text-on-surface truncate">{profile?.full_name || 'Pengguna'}</p>
+                    <p className="text-xs text-on-surface-variant capitalize mt-0.5">{role}</p>
+                  </div>
+                  <Link href="/profile" onClick={() => setIsDropdownOpen(false)} className="px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-primary flex items-center gap-3 transition-colors">
+                    <span className="material-symbols-outlined text-[20px]">person</span> Profil Saya
+                  </Link>
+                  {role !== 'admin' && (
+                    <>
+                      <Link href="/settings" onClick={() => setIsDropdownOpen(false)} className="px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-primary flex items-center gap-3 transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">settings</span> Pengaturan Akun
+                      </Link>
+                      <Link href="/help" onClick={() => setIsDropdownOpen(false)} className="px-4 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container hover:text-primary flex items-center gap-3 transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">help</span> Pusat Bantuan
+                      </Link>
+                    </>
+                  )}
+                  <div className="border-t border-surface-variant/50 mt-2 pt-2">
+                    <button 
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="w-full text-left px-4 py-2.5 text-sm font-bold text-error hover:bg-error/10 flex items-center gap-3 transition-colors disabled:opacity-50"
+                    >
+                      <span className="material-symbols-outlined text-[20px]">logout</span> Keluar
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         ) : (
           <Link 
             href="/login" 

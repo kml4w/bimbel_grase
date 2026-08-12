@@ -15,6 +15,7 @@ type Student = {
   student_name: string
   age: number
   payment_status: string
+  billing_count?: number
   programs?: {
     id: string
     name: string
@@ -124,13 +125,18 @@ export default function StudentsClient({
                       {student.age || '-'} Tahun
                     </td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-lg capitalize ${
-                        student.payment_status === 'verified' ? 'bg-green-100 text-green-700' :
-                        student.payment_status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
-                        {student.payment_status}
-                      </span>
+                      <div className="flex flex-col items-start gap-1">
+                        <span className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-lg capitalize ${
+                          student.payment_status === 'verified' ? 'bg-green-100 text-green-700' :
+                          student.payment_status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
+                        }`}>
+                          {student.payment_status}
+                        </span>
+                        <span className="inline-flex px-2 py-0.5 bg-gray-100 text-gray-600 border border-gray-200 text-[10px] font-bold rounded-md">
+                          Bulan ke-{student.billing_count || 1}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">

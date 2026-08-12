@@ -66,13 +66,13 @@ export async function updateSession(request: NextRequest) {
 
       if (isTutorRoute && role !== 'tutor') {
         const url = request.nextUrl.clone()
-        url.pathname = role === 'admin' ? '/admin/tutors' : role === 'parent' ? '/parent' : '/dashboard'
+        url.pathname = role === 'admin' ? '/admin' : role === 'parent' ? '/parent' : '/dashboard'
         return NextResponse.redirect(url)
       }
 
       if (isParentRoute && role !== 'parent') {
         const url = request.nextUrl.clone()
-        url.pathname = role === 'admin' ? '/admin/tutors' : role === 'tutor' ? '/tutor/modules' : '/dashboard'
+        url.pathname = role === 'admin' ? '/admin' : role === 'tutor' ? '/tutor/modules' : '/dashboard'
         return NextResponse.redirect(url)
       }
 
@@ -80,7 +80,7 @@ export async function updateSession(request: NextRequest) {
       // If hitting login/register or root path while already logged in
       if (isAuthRoute || pathname === '/') {
         const url = request.nextUrl.clone()
-        if (role === 'admin') url.pathname = '/admin/tutors'
+        if (role === 'admin') url.pathname = '/admin'
         else if (role === 'tutor') url.pathname = '/tutor/modules'
         else if (role === 'parent') url.pathname = '/parent'
         else url.pathname = '/dashboard'

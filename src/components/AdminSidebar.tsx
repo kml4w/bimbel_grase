@@ -50,18 +50,7 @@ export default function AdminSidebar({ role }: { role: string | null }) {
               <span>Dasbor Utama</span>
             </Link>
 
-            <Link 
-              href="/admin/tutors" 
-              onClick={closeSidebarMobile}
-              className={`w-full px-3.5 py-3 rounded-xl flex items-center justify-start gap-3 text-left transition-all ${
-                pathname.startsWith('/admin/tutors') 
-                  ? 'text-primary bg-primary/10' 
-                  : 'text-on-surface-variant hover:bg-surface-container-low'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[20px]">group</span>
-              <span>Kelola Tutor</span>
-            </Link>
+
 
             <Link 
               href="/admin/programs" 

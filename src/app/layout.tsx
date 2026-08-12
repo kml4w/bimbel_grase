@@ -19,11 +19,14 @@ export const metadata: Metadata = {
   description: "Platform e-learning dan manajemen bimbingan belajar Bimbel Grase.",
 };
 
+import { ThemeProvider } from "@/components/ThemeProvider";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="id"
       className={`${quicksand.variable} ${nunitoSans.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <head>
         <link
@@ -31,10 +34,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col font-sans bg-surface text-on-surface">
-        <ToastProvider>
-          <LayoutWrapper>{children}</LayoutWrapper>
-        </ToastProvider>
+      <body className="min-h-full flex flex-col font-sans bg-background text-on-background">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ToastProvider>
+            <LayoutWrapper>{children}</LayoutWrapper>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
