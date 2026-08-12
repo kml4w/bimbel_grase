@@ -35,13 +35,22 @@ type Submission = {
   }
 }
 
-export default function GradesClient({ quizGrades, submissions }: { quizGrades: QuizGrade[], submissions: Submission[] }) {
+export default function GradesClient({ quizGrades, submissions, dbPrograms }: { quizGrades: QuizGrade[], submissions: Submission[], dbPrograms: string[] }) {
   const [activeTab, setActiveTab] = useState<'quiz' | 'assignment'>('quiz')
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
   
   const [scoreInput, setScoreInput] = useState('')
   const [notesInput, setNotesInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [selectedClass, setSelectedClass] = useState<string>('all')
+
+  const filteredQuizGrades = quizGrades.filter(g => 
+    selectedClass === 'all' || g.students?.programs?.name === selectedClass
+  )
+
+  const filteredSubmissions = submissions.filter(s => 
+    selectedClass === 'all' || s.students?.programs?.name === selectedClass
+  )
 
   const openGradeModal = (sub: Submission) => {
     setSelectedSubmission(sub)
@@ -86,6 +95,22 @@ export default function GradesClient({ quizGrades, submissions }: { quizGrades: 
         </button>
       </div>
 
+      {/* Filter Kelas */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+        <label htmlFor="classFilter" className="text-sm font-bold text-gray-700">Filter Kelas:</label>
+        <select
+          id="classFilter"
+          value={selectedClass}
+          onChange={(e) => setSelectedClass(e.target.value)}
+          className="p-2 border border-gray-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none min-w-[200px]"
+        >
+          <option value="all">Semua Kelas</option>
+          {dbPrograms.map(cls => (
+            <option key={cls} value={cls}>{cls}</option>
+          ))}
+        </select>
+      </div>
+
       {activeTab === 'quiz' && (
         <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
@@ -101,14 +126,14 @@ export default function GradesClient({ quizGrades, submissions }: { quizGrades: 
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {quizGrades.length === 0 ? (
+                {filteredQuizGrades.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                      Belum ada data nilai kuis yang tersimpan.
+                      {selectedClass === 'all' ? 'Belum ada data nilai kuis yang tersimpan.' : 'Tidak ada data nilai kuis untuk kelas ini.'}
                     </td>
                   </tr>
                 ) : (
-                  quizGrades.map((grade) => (
+                  filteredQuizGrades.map((grade) => (
                     <tr key={grade.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-gray-800">{grade.students?.student_name}</td>
                       <td className="px-6 py-4 text-gray-600">{grade.students?.programs?.name}</td>
@@ -149,14 +174,14 @@ export default function GradesClient({ quizGrades, submissions }: { quizGrades: 
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {submissions.length === 0 ? (
+                {filteredSubmissions.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                      Belum ada siswa yang mengumpulkan tugas manual.
+                      {selectedClass === 'all' ? 'Belum ada siswa yang mengumpulkan tugas manual.' : 'Tidak ada data penugasan untuk kelas ini.'}
                     </td>
                   </tr>
                 ) : (
-                  submissions.map((sub) => (
+                  filteredSubmissions.map((sub) => (
                     <tr key={sub.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 font-medium text-gray-800">
                         {sub.students?.student_name}

@@ -1,11 +1,14 @@
 import GradesClient from './GradesClient'
 import { getQuizGrades, getAssignmentSubmissions } from './actions'
+import { createClient } from '@/utils/supabase/server'
 
 export const metadata = {
   title: 'Penilaian & Rekap Nilai | Dasbor Admin',
 }
 
 export default async function GradesPage() {
+  const supabase = await createClient()
+  const { data: programs } = await supabase.from('programs').select('name').order('name')
   const { data: quizGrades } = await getQuizGrades()
   const { data: submissions } = await getAssignmentSubmissions()
 
@@ -19,6 +22,7 @@ export default async function GradesPage() {
       <GradesClient 
         quizGrades={quizGrades || []} 
         submissions={submissions || []} 
+        dbPrograms={(programs || []).map((p: { name: string }) => p.name)}
       />
     </div>
   )
